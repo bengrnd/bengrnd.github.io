@@ -4,107 +4,1140 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Games | Benjamin Grandmontagne</title>
+  <title>Capital Clues | Benjamin Grandmontagne</title>
 
   <style>
+    :root {
+      color-scheme: light;
+      --ink: #162018;
+      --muted: #5c675f;
+      --line: #d9ded8;
+      --paper: #fbfaf6;
+      --panel: #ffffff;
+      --soft: #eef3ed;
+      --green: #2d7d54;
+      --green-soft: #e4f3e9;
+      --gold: #9b6b1f;
+      --gold-soft: #fff2cf;
+      --red: #a8483c;
+      --red-soft: #f8e7e4;
+      --blue: #356a8b;
+      --blue-soft: #e5f0f5;
+      --shadow: 0 18px 48px rgba(31, 41, 33, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 48px 24px;
-      line-height: 1.6;
-      color: #111;
-      background: #fff;
+      line-height: 1.5;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 6%, rgba(60, 110, 84, 0.14), transparent 28%),
+        radial-gradient(circle at 92% 18%, rgba(206, 151, 48, 0.16), transparent 24%),
+        linear-gradient(180deg, #f7f5ed 0%, #ffffff 52%);
     }
 
-    nav {
-      margin-bottom: 64px;
-      display: flex;
-      gap: 20px;
-      font-size: 14px;
-      flex-wrap: wrap;
-    }
-
-    nav a {
-      color: #111;
-      text-decoration: none;
-      border-bottom: 1px solid #ccc;
-    }
-
-    nav a:hover {
-      border-bottom: 1px solid #111;
-    }
-
-    h1 {
-      font-size: 48px;
-      line-height: 1.1;
-      margin-bottom: 16px;
-    }
-
-    h2 {
-      margin-top: 48px;
-      font-size: 28px;
-    }
-
-    h3 {
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      font-size: 22px;
-      color: #444;
-      max-width: 720px;
-    }
-
-    .card {
-      border: 1px solid #ddd;
-      padding: 24px;
-      border-radius: 12px;
-      margin: 20px 0;
-      background: #fafafa;
-    }
-
-    .small {
-      color: #555;
-      font-size: 14px;
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.24;
+      background-image:
+        linear-gradient(rgba(22, 32, 24, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(22, 32, 24, 0.08) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(180deg, #000 0%, transparent 68%);
     }
 
     a {
-      color: #111;
+      color: var(--ink);
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 34px 0 56px;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-bottom: 34px;
+      font-size: 14px;
+    }
+
+    nav a {
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(22, 32, 24, 0.28);
+    }
+
+    nav a:hover {
+      border-bottom-color: var(--ink);
+    }
+
+    .hero {
+      max-width: 920px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(40px, 7vw, 78px);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      max-width: 680px;
+      margin: 0 0 22px;
+      font-size: clamp(18px, 2vw, 23px);
+      color: var(--muted);
+    }
+
+    .rules {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .rule {
+      width: 100%;
+      min-height: 76px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.72);
+      text-align: left;
+      white-space: normal;
+    }
+
+    .rule:hover,
+    .rule:focus-visible {
+      border-color: var(--blue);
+      background: #fff;
+    }
+
+    .rule strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+
+    .rule span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .kicker {
+      margin: 0 0 12px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .game-shell {
+      display: grid;
+      grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 10px 30px rgba(31, 41, 33, 0.08);
+    }
+
+    .controls {
+      position: sticky;
+      top: 18px;
+      padding: 18px;
+    }
+
+    .controls h2,
+    .history h2 {
+      margin: 0 0 12px;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    input {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 12px;
+      border: 1px solid #bfc8c0;
+      border-radius: 8px;
+      color: var(--ink);
+      background: #fff;
+      font: inherit;
+    }
+
+    input:focus {
+      outline: 3px solid rgba(53, 106, 139, 0.18);
+      border-color: var(--blue);
+    }
+
+    button {
+      min-height: 46px;
+      padding: 0 16px;
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      color: #fff;
+      background: var(--ink);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      background: #2b382e;
+    }
+
+    button.secondary {
+      width: 100%;
+      margin-top: 12px;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    button.secondary:hover {
+      background: var(--soft);
+    }
+
+    button:disabled,
+    input:disabled {
+      cursor: not-allowed;
+      opacity: 0.58;
+    }
+
+    .message {
+      min-height: 50px;
+      margin: 14px 0 0;
+      padding: 12px;
+      border-radius: 8px;
+      color: var(--muted);
+      background: var(--soft);
+      font-size: 14px;
+    }
+
+    .message.win {
+      color: #1e5538;
+      background: var(--green-soft);
+    }
+
+    .message.loss,
+    .message.error {
+      color: #7a342d;
+      background: var(--red-soft);
+    }
+
+    .guess-meter {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 7px;
+      margin: 16px 0;
+    }
+
+    .pip {
+      height: 10px;
+      border-radius: 999px;
+      background: #d9ded8;
+    }
+
+    .pip.used {
+      background: var(--gold);
+    }
+
+    .data-note {
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .history {
+      min-height: 420px;
+      padding: 18px;
+    }
+
+    .empty {
+      display: grid;
+      min-height: 310px;
+      place-items: center;
+      border: 1px dashed #cbd2cb;
+      border-radius: 8px;
+      color: var(--muted);
+      text-align: center;
+      background: rgba(247, 249, 245, 0.68);
+    }
+
+    .guess-card {
+      margin-top: 14px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .guess-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+      background: #f8f8f3;
+    }
+
+    .guess-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .guess-country {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    .guess-number {
+      flex: 0 0 auto;
+      padding: 4px 8px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .clue-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      gap: 1px;
+      background: var(--line);
+    }
+
+    .clue {
+      min-height: 116px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .clue.same {
+      background: var(--green-soft);
+    }
+
+    .clue.close {
+      background: var(--gold-soft);
+    }
+
+    .clue.diff {
+      background: var(--red-soft);
+    }
+
+    .clue.direction {
+      background: var(--blue-soft);
+    }
+
+    .clue-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .info-trigger {
+      width: auto;
+      min-height: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      color: inherit;
+      background: transparent;
+      font: inherit;
+      font-weight: inherit;
+      text-align: left;
+      text-transform: inherit;
+      letter-spacing: inherit;
+      white-space: normal;
+      cursor: pointer;
+    }
+
+    .info-trigger:hover,
+    .info-trigger:focus-visible {
+      color: var(--blue);
+      background: transparent;
+      text-decoration: underline;
+      outline: none;
+    }
+
+    .rule.info-trigger {
+      width: 100%;
+      min-height: 76px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.72);
+      text-decoration: none;
+    }
+
+    .rule.info-trigger:hover,
+    .rule.info-trigger:focus-visible {
+      border-color: var(--blue);
+      color: var(--ink);
+      background: #fff;
+      text-decoration: none;
+      outline: 3px solid rgba(53, 106, 139, 0.18);
+    }
+
+    .clue-main {
+      display: block;
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .clue-detail {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .answer-strip {
+      display: none;
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .answer-strip.visible {
+      display: block;
+    }
+
+    .answer-strip b {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 20px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(22, 32, 24, 0.36);
+    }
+
+    .modal-backdrop[hidden] {
+      display: none;
+    }
+
+    .modal {
+      width: min(520px, 100%);
+      max-height: min(720px, calc(100vh - 36px));
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #f8f8f3;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .modal-close {
+      min-width: 38px;
+      width: 38px;
+      min-height: 38px;
+      padding: 0;
+      border-color: var(--line);
+      color: var(--ink);
+      background: #fff;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .modal-close:hover {
+      background: var(--soft);
+    }
+
+    .modal-body {
+      padding: 18px;
+    }
+
+    .modal-body p {
+      margin: 0 0 14px;
+      color: var(--muted);
+    }
+
+    .category-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .category-list li {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .category-list strong {
+      display: block;
+    }
+
+    .category-list span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .game-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        position: static;
+      }
+
+      .rules {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .clue-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      .page {
+        width: min(100% - 24px, 1120px);
+        padding-top: 24px;
+      }
+
+      nav {
+        margin-bottom: 24px;
+      }
+
+      .rules,
+      .clue-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .input-row {
+        flex-direction: column;
+      }
+
+      .input-row button,
+      button.secondary {
+        width: 100%;
+      }
     }
   </style>
 </head>
 
 <body>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="index.html#lab">AI Workflow Lab</a>
-    <a href="index.html#newsletter">Newsletter</a>
-    <a href="index.html#writing">Writing</a>
-    <a href="index.html#contact">Contact</a>
-  </nav>
+  <div class="page">
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="index.html#lab">AI Workflow Lab</a>
+      <a href="index.html#newsletter">Newsletter</a>
+      <a href="index.html#writing">Writing</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
 
-  <main>
-    <h1>Games</h1>
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="kicker">Game Lab</p>
+          <h1 id="page-title">Capital Clues</h1>
+          <p class="subtitle">
+            Find the mystery capital in 6 guesses by comparing geography, population,
+            language, politics, and elevation.
+          </p>
 
-    <p class="subtitle">
-      A placeholder for small browser games and interactive experiments.
-    </p>
+          <div class="rules" aria-label="Clue categories">
+            <button class="rule info-trigger" type="button" data-category="continent">
+              <strong>Continent</strong>
+              <span>Same or different.</span>
+            </button>
+            <button class="rule info-trigger" type="button" data-category="population">
+              <strong>Population</strong>
+              <span>Higher, lower, or same band.</span>
+            </button>
+            <button class="rule info-trigger" type="button" data-category="language">
+              <strong>Language</strong>
+              <span>Same or different family.</span>
+            </button>
+            <button class="rule info-trigger" type="button" data-category="politics">
+              <strong>Politics</strong>
+              <span>Same or different system.</span>
+            </button>
+            <button class="rule info-trigger" type="button" data-category="elevation">
+              <strong>Elevation</strong>
+              <span>Higher, lower, or same band.</span>
+            </button>
+          </div>
+        </div>
+      </section>
 
-    <section>
-      <h2>Game Lab</h2>
+      <section class="game-shell" aria-label="Capital Clues game">
+        <div class="panel controls">
+          <h2>Make a Guess</h2>
+          <form id="guess-form" autocomplete="off">
+            <label for="guess-input">Capital city</label>
+            <div class="input-row">
+              <input
+                id="guess-input"
+                list="capital-options"
+                name="capital"
+                type="text"
+                placeholder="Try Paris, Tokyo, Quito..."
+                aria-describedby="game-message"
+              />
+              <datalist id="capital-options"></datalist>
+              <button id="guess-button" type="submit">Guess</button>
+            </div>
+          </form>
 
-      <div class="card">
-        <h3>Coming soon</h3>
-        <p>
-          This page will host lightweight games and playful experiments connected to AI,
-          workflow design, and knowledge work.
-        </p>
-        <p class="small">
-          Placeholder page. Game mechanics to be added later.
-        </p>
+          <div class="guess-meter" id="guess-meter" aria-label="Guesses used"></div>
+          <p class="message" id="game-message" role="status" aria-live="polite">
+            Choose a capital from the dataset. Aliases like Kiev and Roma are accepted.
+          </p>
+          <button class="secondary" id="new-game" type="button">New game</button>
+          <p class="data-note">
+            Population and elevation use fixed bands for gameplay, not live statistics.
+          </p>
+        </div>
+
+        <div class="panel history">
+          <h2>Guess History</h2>
+          <div class="answer-strip" id="answer-strip"></div>
+          <div id="history-list">
+            <div class="empty">
+              <p>Your clues will appear here after the first guess.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="category-modal" hidden>
+    <section
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="category-modal-title"
+      aria-describedby="category-modal-description"
+    >
+      <div class="modal-header">
+        <h2 id="category-modal-title">Category</h2>
+        <button class="modal-close" id="category-modal-close" type="button" aria-label="Close category information">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="category-modal-description"></p>
+        <ul class="category-list" id="category-modal-list"></ul>
       </div>
     </section>
-  </main>
+  </div>
+
+  <script>
+    const MAX_GUESSES = 6;
+
+    const categoryInfo = {
+      continent: {
+        title: "Continent",
+        description: "The answer either shares the guessed capital's continent or it does not.",
+        items: [
+          { name: "Africa" },
+          { name: "Asia" },
+          { name: "Europe" },
+          { name: "North America" },
+          { name: "Oceania" },
+          { name: "South America" }
+        ]
+      },
+      population: {
+        title: "Population",
+        description: "Urban area population is compared by broad bands, not exact figures.",
+        items: [
+          { name: "Tiny", detail: "Under 250k" },
+          { name: "Small", detail: "250k-750k" },
+          { name: "Medium", detail: "750k-2m" },
+          { name: "Large", detail: "2m-5m" },
+          { name: "Very large", detail: "5m-10m" },
+          { name: "Megacity", detail: "10m+" }
+        ]
+      },
+      language: {
+        title: "Language",
+        description: "Language uses broad families for the main official language in the game dataset.",
+        items: [
+          { name: "Indo-European" },
+          { name: "Afro-Asiatic" },
+          { name: "Uralic" },
+          { name: "Turkic" },
+          { name: "Japonic" },
+          { name: "Koreanic" },
+          { name: "Sino-Tibetan" },
+          { name: "Tai-Kadai" },
+          { name: "Austroasiatic" },
+          { name: "Niger-Congo" }
+        ]
+      },
+      politics: {
+        title: "Politics",
+        description: "Political systems are simplified into stable gameplay categories.",
+        items: [
+          { name: "Republic" },
+          { name: "Constitutional monarchy" },
+          { name: "Absolute monarchy" },
+          { name: "One-party state" },
+          { name: "Theocracy / religious state" },
+          { name: "Other / transitional" }
+        ]
+      },
+      elevation: {
+        title: "Elevation",
+        description: "Capital elevation is compared by broad bands, not exact meter differences.",
+        items: [
+          { name: "Sea level", detail: "0-50 m" },
+          { name: "Low", detail: "51-250 m" },
+          { name: "Moderate", detail: "251-750 m" },
+          { name: "High", detail: "751-1,500 m" },
+          { name: "Very high", detail: "1,501-2,500 m" },
+          { name: "Extreme", detail: "2,500 m+" }
+        ]
+      }
+    };
+
+    const capitals = [
+      { country: "France", capital: "Paris", aliases: [], continent: "Europe", population: 11000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 35, elevationBand: "Sea level" },
+      { country: "Germany", capital: "Berlin", aliases: [], continent: "Europe", population: 4700000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 34, elevationBand: "Sea level" },
+      { country: "Spain", capital: "Madrid", aliases: [], continent: "Europe", population: 6800000, populationBand: "Very large", languageFamily: "Indo-European", politicalSystem: "Constitutional monarchy", elevation: 650, elevationBand: "Moderate" },
+      { country: "Italy", capital: "Rome", aliases: ["Roma"], continent: "Europe", population: 4300000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 21, elevationBand: "Sea level" },
+      { country: "United Kingdom", capital: "London", aliases: [], continent: "Europe", population: 14500000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Constitutional monarchy", elevation: 11, elevationBand: "Sea level" },
+      { country: "Denmark", capital: "Copenhagen", aliases: ["Kobenhavn"], continent: "Europe", population: 1400000, populationBand: "Medium", languageFamily: "Indo-European", politicalSystem: "Constitutional monarchy", elevation: 14, elevationBand: "Sea level" },
+      { country: "Finland", capital: "Helsinki", aliases: [], continent: "Europe", population: 1300000, populationBand: "Medium", languageFamily: "Uralic", politicalSystem: "Republic", elevation: 17, elevationBand: "Sea level" },
+      { country: "Hungary", capital: "Budapest", aliases: [], continent: "Europe", population: 3000000, populationBand: "Large", languageFamily: "Uralic", politicalSystem: "Republic", elevation: 96, elevationBand: "Low" },
+      { country: "Poland", capital: "Warsaw", aliases: ["Warszawa"], continent: "Europe", population: 3100000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 100, elevationBand: "Low" },
+      { country: "Ukraine", capital: "Kyiv", aliases: ["Kiev"], continent: "Europe", population: 3600000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 179, elevationBand: "Low" },
+      { country: "Greece", capital: "Athens", aliases: [], continent: "Europe", population: 3150000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 70, elevationBand: "Low" },
+      { country: "Russia", capital: "Moscow", aliases: [], continent: "Europe", population: 18000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 156, elevationBand: "Low" },
+      { country: "Turkey", capital: "Ankara", aliases: [], continent: "Asia", population: 5700000, populationBand: "Very large", languageFamily: "Turkic", politicalSystem: "Republic", elevation: 938, elevationBand: "High" },
+      { country: "Japan", capital: "Tokyo", aliases: [], continent: "Asia", population: 37400000, populationBand: "Megacity", languageFamily: "Japonic", politicalSystem: "Constitutional monarchy", elevation: 40, elevationBand: "Sea level" },
+      { country: "South Korea", capital: "Seoul", aliases: [], continent: "Asia", population: 26000000, populationBand: "Megacity", languageFamily: "Koreanic", politicalSystem: "Republic", elevation: 38, elevationBand: "Sea level" },
+      { country: "China", capital: "Beijing", aliases: ["Peking"], continent: "Asia", population: 21000000, populationBand: "Megacity", languageFamily: "Sino-Tibetan", politicalSystem: "One-party state", elevation: 43, elevationBand: "Sea level" },
+      { country: "India", capital: "New Delhi", aliases: ["Delhi"], continent: "Asia", population: 32000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 216, elevationBand: "Low" },
+      { country: "Thailand", capital: "Bangkok", aliases: [], continent: "Asia", population: 18000000, populationBand: "Megacity", languageFamily: "Tai-Kadai", politicalSystem: "Constitutional monarchy", elevation: 1, elevationBand: "Sea level" },
+      { country: "Vietnam", capital: "Hanoi", aliases: [], continent: "Asia", population: 5000000, populationBand: "Very large", languageFamily: "Austroasiatic", politicalSystem: "One-party state", elevation: 19, elevationBand: "Sea level" },
+      { country: "Saudi Arabia", capital: "Riyadh", aliases: [], continent: "Asia", population: 7800000, populationBand: "Very large", languageFamily: "Afro-Asiatic", politicalSystem: "Absolute monarchy", elevation: 612, elevationBand: "Moderate" },
+      { country: "Iran", capital: "Tehran", aliases: [], continent: "Asia", population: 15000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Theocracy / religious state", elevation: 1200, elevationBand: "High" },
+      { country: "United Arab Emirates", capital: "Abu Dhabi", aliases: [], continent: "Asia", population: 1500000, populationBand: "Medium", languageFamily: "Afro-Asiatic", politicalSystem: "Other / transitional", elevation: 27, elevationBand: "Sea level" },
+      { country: "Egypt", capital: "Cairo", aliases: [], continent: "Africa", population: 22000000, populationBand: "Megacity", languageFamily: "Afro-Asiatic", politicalSystem: "Republic", elevation: 23, elevationBand: "Sea level" },
+      { country: "Morocco", capital: "Rabat", aliases: [], continent: "Africa", population: 1900000, populationBand: "Medium", languageFamily: "Afro-Asiatic", politicalSystem: "Constitutional monarchy", elevation: 75, elevationBand: "Low" },
+      { country: "Ethiopia", capital: "Addis Ababa", aliases: [], continent: "Africa", population: 5700000, populationBand: "Very large", languageFamily: "Afro-Asiatic", politicalSystem: "Republic", elevation: 2355, elevationBand: "Very high" },
+      { country: "Kenya", capital: "Nairobi", aliases: [], continent: "Africa", population: 5500000, populationBand: "Very large", languageFamily: "Niger-Congo", politicalSystem: "Republic", elevation: 1795, elevationBand: "Very high" },
+      { country: "Nigeria", capital: "Abuja", aliases: [], continent: "Africa", population: 3700000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 360, elevationBand: "Moderate" },
+      { country: "South Africa", capital: "Pretoria", aliases: [], continent: "Africa", population: 2900000, populationBand: "Large", languageFamily: "Niger-Congo", politicalSystem: "Republic", elevation: 1339, elevationBand: "High" },
+      { country: "Senegal", capital: "Dakar", aliases: [], continent: "Africa", population: 4000000, populationBand: "Large", languageFamily: "Niger-Congo", politicalSystem: "Republic", elevation: 22, elevationBand: "Sea level" },
+      { country: "Brazil", capital: "Brasilia", aliases: ["Brasilia"], continent: "South America", population: 4700000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 1172, elevationBand: "High" },
+      { country: "Argentina", capital: "Buenos Aires", aliases: [], continent: "South America", population: 16000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 25, elevationBand: "Sea level" },
+      { country: "Chile", capital: "Santiago", aliases: [], continent: "South America", population: 7000000, populationBand: "Very large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 570, elevationBand: "Moderate" },
+      { country: "Colombia", capital: "Bogota", aliases: ["Bogota"], continent: "South America", population: 11000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 2640, elevationBand: "Extreme" },
+      { country: "Peru", capital: "Lima", aliases: [], continent: "South America", population: 11000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 154, elevationBand: "Low" },
+      { country: "Ecuador", capital: "Quito", aliases: [], continent: "South America", population: 2000000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 2850, elevationBand: "Extreme" },
+      { country: "Bolivia", capital: "Sucre", aliases: [], continent: "South America", population: 300000, populationBand: "Small", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 2810, elevationBand: "Extreme" },
+      { country: "United States", capital: "Washington", aliases: ["Washington DC", "Washington, D.C.", "D.C.", "DC"], continent: "North America", population: 6300000, populationBand: "Very large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 7, elevationBand: "Sea level" },
+      { country: "Canada", capital: "Ottawa", aliases: [], continent: "North America", population: 1500000, populationBand: "Medium", languageFamily: "Indo-European", politicalSystem: "Constitutional monarchy", elevation: 70, elevationBand: "Low" },
+      { country: "Mexico", capital: "Mexico City", aliases: ["Ciudad de Mexico"], continent: "North America", population: 22000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 2240, elevationBand: "Very high" },
+      { country: "Australia", capital: "Canberra", aliases: [], continent: "Oceania", population: 470000, populationBand: "Small", languageFamily: "Indo-European", politicalSystem: "Constitutional monarchy", elevation: 578, elevationBand: "Moderate" }
+    ];
+
+    const populationRanks = {
+      "Tiny": 0,
+      "Small": 1,
+      "Medium": 2,
+      "Large": 3,
+      "Very large": 4,
+      "Megacity": 5
+    };
+
+    const elevationRanks = {
+      "Sea level": 0,
+      "Low": 1,
+      "Moderate": 2,
+      "High": 3,
+      "Very high": 4,
+      "Extreme": 5
+    };
+
+    const form = document.querySelector("#guess-form");
+    const input = document.querySelector("#guess-input");
+    const datalist = document.querySelector("#capital-options");
+    const message = document.querySelector("#game-message");
+    const historyList = document.querySelector("#history-list");
+    const meter = document.querySelector("#guess-meter");
+    const answerStrip = document.querySelector("#answer-strip");
+    const newGameButton = document.querySelector("#new-game");
+    const guessButton = document.querySelector("#guess-button");
+    const categoryModal = document.querySelector("#category-modal");
+    const categoryModalTitle = document.querySelector("#category-modal-title");
+    const categoryModalDescription = document.querySelector("#category-modal-description");
+    const categoryModalList = document.querySelector("#category-modal-list");
+    const categoryModalClose = document.querySelector("#category-modal-close");
+
+    let answer;
+    let guesses;
+    let gameOver;
+    let activeInfoTrigger;
+
+    function normalize(value) {
+      return value
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[.,]/g, "")
+        .replace(/\s+/g, " ");
+    }
+
+    function formatNumber(value) {
+      return new Intl.NumberFormat("en-US").format(value);
+    }
+
+    function categoryRange(categoryKey, band) {
+      const item = categoryInfo[categoryKey].items.find((entry) => entry.name === band);
+      return item && item.detail ? item.detail : "";
+    }
+
+    function categoryLabel(categoryKey, band) {
+      const range = categoryRange(categoryKey, band);
+      return range ? `${band}: ${range}` : band;
+    }
+
+    function findCapital(value) {
+      const target = normalize(value);
+      return capitals.find((item) => {
+        const names = [item.capital, ...item.aliases];
+        return names.some((name) => normalize(name) === target);
+      });
+    }
+
+    function populateOptions() {
+      const fragment = document.createDocumentFragment();
+      capitals
+        .map((item) => item.capital)
+        .sort((a, b) => a.localeCompare(b))
+        .forEach((capital) => {
+          const option = document.createElement("option");
+          option.value = capital;
+          fragment.appendChild(option);
+        });
+      datalist.appendChild(fragment);
+    }
+
+    function setMessage(text, type = "") {
+      message.className = `message${type ? ` ${type}` : ""}`;
+      message.textContent = text;
+    }
+
+    function buildMeter() {
+      meter.innerHTML = "";
+      for (let index = 0; index < MAX_GUESSES; index += 1) {
+        const pip = document.createElement("span");
+        pip.className = `pip${index < guesses.length ? " used" : ""}`;
+        meter.appendChild(pip);
+      }
+    }
+
+    function comparisonClue(label, categoryKey, guessBand, answerBand, ranks, unitLabel, guessExact, answerExact) {
+      const guessRank = ranks[guessBand];
+      const answerRank = ranks[answerBand];
+
+      if (guessRank === answerRank) {
+        return {
+          label,
+          categoryKey,
+          status: "close",
+          main: "Same band",
+          detail: categoryLabel(categoryKey, answerBand)
+        };
+      }
+
+      return {
+        label,
+        categoryKey,
+        status: "direction",
+        main: answerRank > guessRank ? "Answer is higher" : "Answer is lower",
+        detail: `Your guess: ${categoryLabel(categoryKey, guessBand)} (${formatNumber(guessExact)}${unitLabel})`
+      };
+    }
+
+    function sameDifferentClue(label, categoryKey, guessValue, answerValue) {
+      const same = guessValue === answerValue;
+      return {
+        label,
+        categoryKey,
+        status: same ? "same" : "diff",
+        main: same ? "Same" : "Different",
+        detail: same ? answerValue : `Your guess: ${guessValue}`
+      };
+    }
+
+    function getClues(guess) {
+      return [
+        sameDifferentClue("Continent", "continent", guess.continent, answer.continent),
+        comparisonClue("Population", "population", guess.populationBand, answer.populationBand, populationRanks, "", guess.population, answer.population),
+        sameDifferentClue("Language", "language", guess.languageFamily, answer.languageFamily),
+        sameDifferentClue("Politics", "politics", guess.politicalSystem, answer.politicalSystem),
+        comparisonClue("Elevation", "elevation", guess.elevationBand, answer.elevationBand, elevationRanks, " m", guess.elevation, answer.elevation)
+      ];
+    }
+
+    function renderGuess(guess, index) {
+      const card = document.createElement("article");
+      card.className = "guess-card";
+
+      const header = document.createElement("div");
+      header.className = "guess-header";
+      header.innerHTML = `
+        <div>
+          <h3 class="guess-title">${guess.capital}</h3>
+          <span class="guess-country">${guess.country}</span>
+        </div>
+        <span class="guess-number">Guess ${index + 1}/${MAX_GUESSES}</span>
+      `;
+
+      const grid = document.createElement("div");
+      grid.className = "clue-grid";
+
+      getClues(guess).forEach((clue) => {
+        const clueTile = document.createElement("div");
+        clueTile.className = `clue ${clue.status}`;
+        clueTile.innerHTML = `
+          <span class="clue-label">
+            <button class="info-trigger" type="button" data-category="${clue.categoryKey}">${clue.label}</button>
+          </span>
+          <span class="clue-main">${clue.main}</span>
+          <span class="clue-detail">${clue.detail}</span>
+        `;
+        grid.appendChild(clueTile);
+      });
+
+      card.append(header, grid);
+      return card;
+    }
+
+    function renderHistory() {
+      historyList.innerHTML = "";
+
+      if (guesses.length === 0) {
+        historyList.innerHTML = `
+          <div class="empty">
+            <p>Your clues will appear here after the first guess.</p>
+          </div>
+        `;
+        return;
+      }
+
+      guesses.forEach((guess, index) => {
+        historyList.prepend(renderGuess(guess, index));
+      });
+    }
+
+    function showAnswer() {
+      answerStrip.classList.add("visible");
+      answerStrip.innerHTML = `
+        <b>${answer.capital}, ${answer.country}</b>
+        <span>${answer.continent} &middot; ${answer.languageFamily} &middot; ${answer.politicalSystem} &middot; ${categoryLabel("population", answer.populationBand)} population &middot; ${categoryLabel("elevation", answer.elevationBand)} elevation</span>
+      `;
+    }
+
+    function openCategoryInfo(categoryKey, trigger) {
+      const info = categoryInfo[categoryKey];
+
+      if (!info) {
+        return;
+      }
+
+      activeInfoTrigger = trigger;
+      categoryModalTitle.textContent = info.title;
+      categoryModalDescription.textContent = info.description;
+      categoryModalList.innerHTML = "";
+
+      info.items.forEach((item) => {
+        const listItem = document.createElement("li");
+        listItem.innerHTML = `
+          <strong>${item.name}</strong>
+          ${item.detail ? `<span>${item.detail}</span>` : ""}
+        `;
+        categoryModalList.appendChild(listItem);
+      });
+
+      categoryModal.hidden = false;
+      categoryModalClose.focus();
+    }
+
+    function closeCategoryInfo() {
+      categoryModal.hidden = true;
+
+      if (activeInfoTrigger) {
+        activeInfoTrigger.focus();
+        activeInfoTrigger = null;
+      }
+    }
+
+    function hideAnswer() {
+      answerStrip.classList.remove("visible");
+      answerStrip.innerHTML = "";
+    }
+
+    function finishGame(didWin) {
+      gameOver = true;
+      input.disabled = true;
+      guessButton.disabled = true;
+      showAnswer();
+
+      if (didWin) {
+        setMessage(`Correct. You found ${answer.capital} in ${guesses.length} ${guesses.length === 1 ? "guess" : "guesses"}.`, "win");
+      } else {
+        setMessage(`Out of guesses. The mystery capital was ${answer.capital}.`, "loss");
+      }
+    }
+
+    function handleGuess(event) {
+      event.preventDefault();
+
+      if (gameOver) {
+        return;
+      }
+
+      const guess = findCapital(input.value);
+
+      if (!guess) {
+        setMessage("That capital is not in this dataset. Pick one from the suggestions.", "error");
+        return;
+      }
+
+      if (guesses.some((item) => item.capital === guess.capital)) {
+        setMessage(`You already tried ${guess.capital}. Choose another capital.`, "error");
+        input.select();
+        return;
+      }
+
+      guesses.push(guess);
+      input.value = "";
+      buildMeter();
+      renderHistory();
+
+      if (guess.capital === answer.capital) {
+        finishGame(true);
+        return;
+      }
+
+      if (guesses.length >= MAX_GUESSES) {
+        finishGame(false);
+        return;
+      }
+
+      const remaining = MAX_GUESSES - guesses.length;
+      setMessage(`${remaining} ${remaining === 1 ? "guess" : "guesses"} left. Use the clue pattern to narrow the field.`);
+      input.focus();
+    }
+
+    function startGame() {
+      answer = capitals[Math.floor(Math.random() * capitals.length)];
+      guesses = [];
+      gameOver = false;
+      input.disabled = false;
+      guessButton.disabled = false;
+      input.value = "";
+      hideAnswer();
+      buildMeter();
+      renderHistory();
+      setMessage("Choose a capital from the dataset. Aliases like Kiev and Roma are accepted.");
+      input.focus();
+    }
+
+    populateOptions();
+    form.addEventListener("submit", handleGuess);
+    newGameButton.addEventListener("click", startGame);
+    document.addEventListener("click", (event) => {
+      const trigger = event.target.closest(".info-trigger");
+
+      if (trigger && trigger.dataset.category) {
+        openCategoryInfo(trigger.dataset.category, trigger);
+        return;
+      }
+
+      if (event.target === categoryModal) {
+        closeCategoryInfo();
+      }
+    });
+    categoryModalClose.addEventListener("click", closeCategoryInfo);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !categoryModal.hidden) {
+        closeCategoryInfo();
+      }
+    });
+    startGame();
+  </script>
 </body>
 </html>
