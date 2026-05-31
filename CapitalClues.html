@@ -109,6 +109,9 @@
     }
 
     .rule {
+      display: flex;
+      align-items: center;
+      gap: 11px;
       width: 100%;
       min-height: 76px;
       padding: 12px;
@@ -118,6 +121,10 @@
       background: rgba(255, 255, 255, 0.72);
       text-align: left;
       white-space: normal;
+    }
+
+    .rule-copy {
+      min-width: 0;
     }
 
     .rule:hover,
@@ -132,9 +139,179 @@
       font-size: 13px;
     }
 
-    .rule span {
+    .rule-copy span {
       color: var(--muted);
       font-size: 12px;
+    }
+
+    .category-logo {
+      --logo-accent: var(--green);
+      position: relative;
+      flex: 0 0 auto;
+      display: inline-grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(22, 32, 24, 0.12);
+      border-radius: 8px;
+      color: var(--logo-accent);
+      background:
+        radial-gradient(circle at 28% 24%, rgba(255, 255, 255, 0.95), transparent 26%),
+        linear-gradient(145deg, #ffffff, color-mix(in srgb, var(--logo-accent) 12%, #f7f5ed));
+      box-shadow: inset 0 -1px 0 rgba(22, 32, 24, 0.08);
+    }
+
+    .category-logo::before,
+    .category-logo::after,
+    .category-logo span,
+    .category-logo span::before,
+    .category-logo span::after {
+      content: "";
+      position: absolute;
+      display: block;
+    }
+
+    .category-logo span {
+      color: inherit;
+    }
+
+    .category-logo.continent {
+      --logo-accent: var(--green);
+    }
+
+    .category-logo.continent::before {
+      width: 24px;
+      height: 24px;
+      border: 2px solid currentColor;
+      border-radius: 999px;
+    }
+
+    .category-logo.continent::after {
+      width: 24px;
+      height: 10px;
+      border-top: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      opacity: 0.78;
+    }
+
+    .category-logo.continent span {
+      width: 9px;
+      height: 22px;
+      border-left: 2px solid currentColor;
+      border-right: 2px solid currentColor;
+      border-radius: 999px;
+      opacity: 0.78;
+    }
+
+    .category-logo.population {
+      --logo-accent: var(--gold);
+    }
+
+    .category-logo.population::before {
+      width: 12px;
+      height: 12px;
+      top: 8px;
+      left: 14px;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow:
+        -10px 7px 0 -2px currentColor,
+        10px 7px 0 -2px currentColor;
+    }
+
+    .category-logo.population::after {
+      width: 22px;
+      height: 12px;
+      left: 9px;
+      bottom: 8px;
+      border-radius: 999px 999px 6px 6px;
+      background: currentColor;
+      opacity: 0.82;
+      box-shadow:
+        -9px 3px 0 -3px currentColor,
+        9px 3px 0 -3px currentColor;
+    }
+
+    .category-logo.coastline {
+      --logo-accent: var(--blue);
+    }
+
+    .category-logo.coastline::before {
+      width: 26px;
+      height: 13px;
+      left: 7px;
+      top: 10px;
+      border: 2px solid currentColor;
+      border-color: transparent transparent currentColor currentColor;
+      border-radius: 0 0 0 18px;
+      transform: rotate(-10deg);
+    }
+
+    .category-logo.coastline::after {
+      width: 25px;
+      height: 8px;
+      left: 8px;
+      bottom: 9px;
+      border-top: 2px solid currentColor;
+      border-radius: 999px;
+      box-shadow: 0 -6px 0 -1px color-mix(in srgb, currentColor 62%, transparent);
+    }
+
+    .category-logo.politics {
+      --logo-accent: var(--red);
+    }
+
+    .category-logo.politics::before {
+      width: 25px;
+      height: 4px;
+      top: 12px;
+      left: 7px;
+      background: currentColor;
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+      transform: translateY(-5px);
+    }
+
+    .category-logo.politics::after {
+      width: 26px;
+      height: 3px;
+      left: 7px;
+      bottom: 8px;
+      border-top: 3px solid currentColor;
+      border-bottom: 3px solid currentColor;
+    }
+
+    .category-logo.politics span {
+      width: 3px;
+      height: 14px;
+      left: 12px;
+      top: 17px;
+      background: currentColor;
+      box-shadow:
+        7px 0 0 currentColor,
+        14px 0 0 currentColor;
+    }
+
+    .category-logo.elevation {
+      --logo-accent: var(--green);
+    }
+
+    .category-logo.elevation::before {
+      width: 25px;
+      height: 20px;
+      left: 7px;
+      bottom: 8px;
+      background: currentColor;
+      clip-path: polygon(0 100%, 38% 28%, 52% 50%, 66% 18%, 100% 100%);
+    }
+
+    .category-logo.elevation::after {
+      width: 9px;
+      height: 7px;
+      left: 16px;
+      top: 13px;
+      background: #fff;
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+      opacity: 0.9;
     }
 
     .kicker {
@@ -373,7 +550,9 @@
     }
 
     .clue-label {
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: 8px;
       margin-bottom: 8px;
       color: var(--muted);
       font-size: 12px;
@@ -408,6 +587,9 @@
     }
 
     .rule.info-trigger {
+      display: flex;
+      align-items: center;
+      gap: 11px;
       width: 100%;
       min-height: 76px;
       padding: 12px;
@@ -425,6 +607,111 @@
       background: #fff;
       text-decoration: none;
       outline: 3px solid rgba(53, 106, 139, 0.18);
+    }
+
+    .clue .category-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      opacity: 0.94;
+    }
+
+    .clue .category-logo.continent::before {
+      width: 17px;
+      height: 17px;
+      border-width: 1.5px;
+    }
+
+    .clue .category-logo.continent::after {
+      width: 17px;
+      height: 7px;
+      border-top-width: 1.5px;
+      border-bottom-width: 1.5px;
+    }
+
+    .clue .category-logo.continent span {
+      width: 7px;
+      height: 16px;
+      border-left-width: 1.5px;
+      border-right-width: 1.5px;
+    }
+
+    .clue .category-logo.population::before {
+      width: 8px;
+      height: 8px;
+      top: 6px;
+      left: 10px;
+      box-shadow:
+        -7px 5px 0 -1.5px currentColor,
+        7px 5px 0 -1.5px currentColor;
+    }
+
+    .clue .category-logo.population::after {
+      width: 16px;
+      height: 9px;
+      left: 6px;
+      bottom: 6px;
+      box-shadow:
+        -6px 2px 0 -2px currentColor,
+        6px 2px 0 -2px currentColor;
+    }
+
+    .clue .category-logo.coastline::before {
+      width: 18px;
+      height: 9px;
+      left: 5px;
+      top: 7px;
+      border-width: 1.5px;
+    }
+
+    .clue .category-logo.coastline::after {
+      width: 18px;
+      height: 6px;
+      left: 5px;
+      bottom: 6px;
+      border-top-width: 1.5px;
+      box-shadow: 0 -4px 0 -1px color-mix(in srgb, currentColor 62%, transparent);
+    }
+
+    .clue .category-logo.politics::before {
+      width: 18px;
+      height: 3px;
+      top: 9px;
+      left: 5px;
+      transform: translateY(-3px);
+    }
+
+    .clue .category-logo.politics::after {
+      width: 18px;
+      height: 2px;
+      left: 5px;
+      bottom: 6px;
+      border-top-width: 2px;
+      border-bottom-width: 2px;
+    }
+
+    .clue .category-logo.politics span {
+      width: 2px;
+      height: 10px;
+      left: 9px;
+      top: 12px;
+      box-shadow:
+        5px 0 0 currentColor,
+        10px 0 0 currentColor;
+    }
+
+    .clue .category-logo.elevation::before {
+      width: 18px;
+      height: 15px;
+      left: 5px;
+      bottom: 6px;
+    }
+
+    .clue .category-logo.elevation::after {
+      width: 7px;
+      height: 5px;
+      left: 11px;
+      top: 9px;
     }
 
     .clue-main {
@@ -680,7 +967,7 @@
     <main>
       <section class="hero" aria-labelledby="page-title">
         <div>
-          <p class="kicker">Game Lab</p>
+          <p class="kicker">Capital Clues</p>
           <h1 id="page-title">Capital Clues</h1>
           <p class="subtitle">
             Find the mystery capital in 6 guesses by comparing geography, population,
@@ -689,24 +976,39 @@
 
           <div class="rules" aria-label="Clue categories">
             <button class="rule info-trigger" type="button" data-category="continent">
-              <strong>Continent</strong>
-              <span>Same or different.</span>
+              <span class="category-logo continent" aria-hidden="true"><span></span></span>
+              <span class="rule-copy">
+                <strong>Continent</strong>
+                <span>Same or different.</span>
+              </span>
             </button>
             <button class="rule info-trigger" type="button" data-category="population">
-              <strong>Population</strong>
-              <span>Higher, lower, or same band.</span>
+              <span class="category-logo population" aria-hidden="true"><span></span></span>
+              <span class="rule-copy">
+                <strong>Population</strong>
+                <span>Higher, lower, or same band.</span>
+              </span>
             </button>
             <button class="rule info-trigger" type="button" data-category="coastline">
-              <strong>Coastline</strong>
-              <span>Country has a coastline or is landlocked.</span>
+              <span class="category-logo coastline" aria-hidden="true"><span></span></span>
+              <span class="rule-copy">
+                <strong>Coastline</strong>
+                <span>Country has a coastline or is landlocked.</span>
+              </span>
             </button>
             <button class="rule info-trigger" type="button" data-category="politics">
-              <strong>Politics</strong>
-              <span>Same or different system.</span>
+              <span class="category-logo politics" aria-hidden="true"><span></span></span>
+              <span class="rule-copy">
+                <strong>Politics</strong>
+                <span>Same or different system.</span>
+              </span>
             </button>
             <button class="rule info-trigger" type="button" data-category="elevation">
-              <strong>Elevation</strong>
-              <span>Higher, lower, or same band.</span>
+              <span class="category-logo elevation" aria-hidden="true"><span></span></span>
+              <span class="rule-copy">
+                <strong>Elevation</strong>
+                <span>Higher, lower, or same band.</span>
+              </span>
             </button>
           </div>
         </div>
@@ -1099,6 +1401,10 @@
       return range ? `${band}: ${range}` : band;
     }
 
+    function categoryLogo(categoryKey) {
+      return `<span class="category-logo ${categoryKey}" aria-hidden="true"><span></span></span>`;
+    }
+
     function findCapital(value) {
       const target = normalize(value);
       return capitals.find((item) => {
@@ -1243,6 +1549,7 @@
         clueTile.className = `clue ${clue.status}`;
         clueTile.innerHTML = `
           <span class="clue-label">
+            ${categoryLogo(clue.categoryKey)}
             <button class="info-trigger" type="button" data-category="${clue.categoryKey}">${clue.label}</button>
           </span>
           <span class="clue-main">${clue.main}</span>
