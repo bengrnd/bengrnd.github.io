@@ -251,6 +251,11 @@
       background: var(--green-soft);
     }
 
+    .message.win.celebrate,
+    .answer-strip.celebrate {
+      animation: winPulse 900ms ease-out 2;
+    }
+
     .message.loss,
     .message.error {
       color: #7a342d;
@@ -546,6 +551,77 @@
       font-size: 13px;
     }
 
+    .win-celebration {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .win-celebration.active {
+      display: block;
+    }
+
+    .win-particle {
+      position: absolute;
+      top: 52%;
+      left: 50%;
+      width: var(--size, 10px);
+      height: var(--size, 10px);
+      border-radius: 999px;
+      opacity: 0;
+      background: var(--color, var(--green));
+      box-shadow: 0 0 14px rgba(45, 125, 84, 0.18);
+      transform: translate(-50%, -50%);
+      animation: winBurst 1100ms cubic-bezier(0.15, 0.9, 0.2, 1) forwards;
+      animation-delay: var(--delay, 0ms);
+    }
+
+    @keyframes winBurst {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+      }
+
+      16% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        transform:
+          translate(calc(-50% + var(--x, 0px)), calc(-50% + var(--y, 0px)))
+          rotate(var(--rotation, 0deg))
+          scale(1.08);
+      }
+    }
+
+    @keyframes winPulse {
+      0%,
+      100% {
+        box-shadow: none;
+        transform: translateY(0);
+      }
+
+      45% {
+        box-shadow: 0 0 0 5px rgba(45, 125, 84, 0.13), 0 16px 34px rgba(45, 125, 84, 0.18);
+        transform: translateY(-2px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .win-celebration.active {
+        display: none;
+      }
+
+      .message.win.celebrate,
+      .answer-strip.celebrate {
+        animation: none;
+      }
+    }
+
     @media (max-width: 900px) {
       .game-shell {
         grid-template-columns: 1fr;
@@ -608,7 +684,7 @@
           <h1 id="page-title">Capital Clues</h1>
           <p class="subtitle">
             Find the mystery capital in 6 guesses by comparing geography, population,
-            language, politics, and elevation.
+            coastline, politics, and elevation.
           </p>
 
           <div class="rules" aria-label="Clue categories">
@@ -620,9 +696,9 @@
               <strong>Population</strong>
               <span>Higher, lower, or same band.</span>
             </button>
-            <button class="rule info-trigger" type="button" data-category="language">
-              <strong>Language</strong>
-              <span>Same or different family.</span>
+            <button class="rule info-trigger" type="button" data-category="coastline">
+              <strong>Coastline</strong>
+              <span>Country has a coastline or is landlocked.</span>
             </button>
             <button class="rule info-trigger" type="button" data-category="politics">
               <strong>Politics</strong>
@@ -657,7 +733,7 @@
 
           <div class="guess-meter" id="guess-meter" aria-label="Guesses used"></div>
           <p class="message" id="game-message" role="status" aria-live="polite">
-            Choose a capital from the dataset. Aliases like Kiev and Roma are accepted.
+            Choose a capital from the world dataset. Aliases like Kiev and Roma are accepted.
           </p>
           <button class="secondary" id="new-game" type="button">New game</button>
           <p class="data-note">
@@ -697,6 +773,8 @@
     </section>
   </div>
 
+  <div class="win-celebration" id="win-celebration" aria-hidden="true"></div>
+
   <script>
     const MAX_GUESSES = 6;
 
@@ -725,20 +803,12 @@
           { name: "Megacity", detail: "10m+" }
         ]
       },
-      language: {
-        title: "Language",
-        description: "Language uses broad families for the main official language in the game dataset.",
+      coastline: {
+        title: "Coastline",
+        description: "This compares whether the country itself has a coastline or is landlocked.",
         items: [
-          { name: "Indo-European" },
-          { name: "Afro-Asiatic" },
-          { name: "Uralic" },
-          { name: "Turkic" },
-          { name: "Japonic" },
-          { name: "Koreanic" },
-          { name: "Sino-Tibetan" },
-          { name: "Tai-Kadai" },
-          { name: "Austroasiatic" },
-          { name: "Niger-Congo" }
+          { name: "Coastal", detail: "The country has access to an ocean or sea." },
+          { name: "Landlocked", detail: "The country has no ocean or sea coastline." }
         ]
       },
       politics: {
@@ -768,46 +838,201 @@
     };
 
     const capitals = [
-      { country: "France", capital: "Paris", aliases: [], continent: "Europe", population: 11000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 35, elevationBand: "Sea level" },
-      { country: "Germany", capital: "Berlin", aliases: [], continent: "Europe", population: 4700000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 34, elevationBand: "Sea level" },
-      { country: "Spain", capital: "Madrid", aliases: [], continent: "Europe", population: 6800000, populationBand: "Very large", languageFamily: "Indo-European", politicalSystem: "Constitutional monarchy", elevation: 650, elevationBand: "Moderate" },
-      { country: "Italy", capital: "Rome", aliases: ["Roma"], continent: "Europe", population: 4300000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 21, elevationBand: "Sea level" },
-      { country: "United Kingdom", capital: "London", aliases: [], continent: "Europe", population: 14500000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Constitutional monarchy", elevation: 11, elevationBand: "Sea level" },
-      { country: "Denmark", capital: "Copenhagen", aliases: ["Kobenhavn"], continent: "Europe", population: 1400000, populationBand: "Medium", languageFamily: "Indo-European", politicalSystem: "Constitutional monarchy", elevation: 14, elevationBand: "Sea level" },
-      { country: "Finland", capital: "Helsinki", aliases: [], continent: "Europe", population: 1300000, populationBand: "Medium", languageFamily: "Uralic", politicalSystem: "Republic", elevation: 17, elevationBand: "Sea level" },
-      { country: "Hungary", capital: "Budapest", aliases: [], continent: "Europe", population: 3000000, populationBand: "Large", languageFamily: "Uralic", politicalSystem: "Republic", elevation: 96, elevationBand: "Low" },
-      { country: "Poland", capital: "Warsaw", aliases: ["Warszawa"], continent: "Europe", population: 3100000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 100, elevationBand: "Low" },
-      { country: "Ukraine", capital: "Kyiv", aliases: ["Kiev"], continent: "Europe", population: 3600000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 179, elevationBand: "Low" },
-      { country: "Greece", capital: "Athens", aliases: [], continent: "Europe", population: 3150000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 70, elevationBand: "Low" },
-      { country: "Russia", capital: "Moscow", aliases: [], continent: "Europe", population: 18000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 156, elevationBand: "Low" },
-      { country: "Turkey", capital: "Ankara", aliases: [], continent: "Asia", population: 5700000, populationBand: "Very large", languageFamily: "Turkic", politicalSystem: "Republic", elevation: 938, elevationBand: "High" },
-      { country: "Japan", capital: "Tokyo", aliases: [], continent: "Asia", population: 37400000, populationBand: "Megacity", languageFamily: "Japonic", politicalSystem: "Constitutional monarchy", elevation: 40, elevationBand: "Sea level" },
-      { country: "South Korea", capital: "Seoul", aliases: [], continent: "Asia", population: 26000000, populationBand: "Megacity", languageFamily: "Koreanic", politicalSystem: "Republic", elevation: 38, elevationBand: "Sea level" },
-      { country: "China", capital: "Beijing", aliases: ["Peking"], continent: "Asia", population: 21000000, populationBand: "Megacity", languageFamily: "Sino-Tibetan", politicalSystem: "One-party state", elevation: 43, elevationBand: "Sea level" },
-      { country: "India", capital: "New Delhi", aliases: ["Delhi"], continent: "Asia", population: 32000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 216, elevationBand: "Low" },
-      { country: "Thailand", capital: "Bangkok", aliases: [], continent: "Asia", population: 18000000, populationBand: "Megacity", languageFamily: "Tai-Kadai", politicalSystem: "Constitutional monarchy", elevation: 1, elevationBand: "Sea level" },
-      { country: "Vietnam", capital: "Hanoi", aliases: [], continent: "Asia", population: 5000000, populationBand: "Very large", languageFamily: "Austroasiatic", politicalSystem: "One-party state", elevation: 19, elevationBand: "Sea level" },
-      { country: "Saudi Arabia", capital: "Riyadh", aliases: [], continent: "Asia", population: 7800000, populationBand: "Very large", languageFamily: "Afro-Asiatic", politicalSystem: "Absolute monarchy", elevation: 612, elevationBand: "Moderate" },
-      { country: "Iran", capital: "Tehran", aliases: [], continent: "Asia", population: 15000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Theocracy / religious state", elevation: 1200, elevationBand: "High" },
-      { country: "United Arab Emirates", capital: "Abu Dhabi", aliases: [], continent: "Asia", population: 1500000, populationBand: "Medium", languageFamily: "Afro-Asiatic", politicalSystem: "Other / transitional", elevation: 27, elevationBand: "Sea level" },
-      { country: "Egypt", capital: "Cairo", aliases: [], continent: "Africa", population: 22000000, populationBand: "Megacity", languageFamily: "Afro-Asiatic", politicalSystem: "Republic", elevation: 23, elevationBand: "Sea level" },
-      { country: "Morocco", capital: "Rabat", aliases: [], continent: "Africa", population: 1900000, populationBand: "Medium", languageFamily: "Afro-Asiatic", politicalSystem: "Constitutional monarchy", elevation: 75, elevationBand: "Low" },
-      { country: "Ethiopia", capital: "Addis Ababa", aliases: [], continent: "Africa", population: 5700000, populationBand: "Very large", languageFamily: "Afro-Asiatic", politicalSystem: "Republic", elevation: 2355, elevationBand: "Very high" },
-      { country: "Kenya", capital: "Nairobi", aliases: [], continent: "Africa", population: 5500000, populationBand: "Very large", languageFamily: "Niger-Congo", politicalSystem: "Republic", elevation: 1795, elevationBand: "Very high" },
-      { country: "Nigeria", capital: "Abuja", aliases: [], continent: "Africa", population: 3700000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 360, elevationBand: "Moderate" },
-      { country: "South Africa", capital: "Pretoria", aliases: [], continent: "Africa", population: 2900000, populationBand: "Large", languageFamily: "Niger-Congo", politicalSystem: "Republic", elevation: 1339, elevationBand: "High" },
-      { country: "Senegal", capital: "Dakar", aliases: [], continent: "Africa", population: 4000000, populationBand: "Large", languageFamily: "Niger-Congo", politicalSystem: "Republic", elevation: 22, elevationBand: "Sea level" },
-      { country: "Brazil", capital: "Brasilia", aliases: ["Brasilia"], continent: "South America", population: 4700000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 1172, elevationBand: "High" },
-      { country: "Argentina", capital: "Buenos Aires", aliases: [], continent: "South America", population: 16000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 25, elevationBand: "Sea level" },
-      { country: "Chile", capital: "Santiago", aliases: [], continent: "South America", population: 7000000, populationBand: "Very large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 570, elevationBand: "Moderate" },
-      { country: "Colombia", capital: "Bogota", aliases: ["Bogota"], continent: "South America", population: 11000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 2640, elevationBand: "Extreme" },
-      { country: "Peru", capital: "Lima", aliases: [], continent: "South America", population: 11000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 154, elevationBand: "Low" },
-      { country: "Ecuador", capital: "Quito", aliases: [], continent: "South America", population: 2000000, populationBand: "Large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 2850, elevationBand: "Extreme" },
-      { country: "Bolivia", capital: "Sucre", aliases: [], continent: "South America", population: 300000, populationBand: "Small", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 2810, elevationBand: "Extreme" },
-      { country: "United States", capital: "Washington", aliases: ["Washington DC", "Washington, D.C.", "D.C.", "DC"], continent: "North America", population: 6300000, populationBand: "Very large", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 7, elevationBand: "Sea level" },
-      { country: "Canada", capital: "Ottawa", aliases: [], continent: "North America", population: 1500000, populationBand: "Medium", languageFamily: "Indo-European", politicalSystem: "Constitutional monarchy", elevation: 70, elevationBand: "Low" },
-      { country: "Mexico", capital: "Mexico City", aliases: ["Ciudad de Mexico"], continent: "North America", population: 22000000, populationBand: "Megacity", languageFamily: "Indo-European", politicalSystem: "Republic", elevation: 2240, elevationBand: "Very high" },
-      { country: "Australia", capital: "Canberra", aliases: [], continent: "Oceania", population: 470000, populationBand: "Small", languageFamily: "Indo-European", politicalSystem: "Constitutional monarchy", elevation: 578, elevationBand: "Moderate" }
+      {country:"Afghanistan",capital:"Kabul",aliases:[],continent:"Asia",population:4434550,populationBand:"Large",coastline:"Landlocked",politicalSystem:"Theocracy / religious state",elevation:1798,elevationBand:"Very high"},
+      {country:"Albania",capital:"Tirana",aliases:[],continent:"Europe",population:418495,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:113,elevationBand:"Low"},
+      {country:"Algeria",capital:"Algiers",aliases:[],continent:"Africa",population:2364230,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:113,elevationBand:"Low"},
+      {country:"Andorra",capital:"Andorra la Vella",aliases:[],continent:"Europe",population:20430,populationBand:"Tiny",coastline:"Landlocked",politicalSystem:"Constitutional monarchy",elevation:1037,elevationBand:"High"},
+      {country:"Angola",capital:"Luanda",aliases:[],continent:"Africa",population:2776168,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:73,elevationBand:"Low"},
+      {country:"Antigua and Barbuda",capital:"Saint John's",aliases:[],continent:"North America",population:51737,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:12,elevationBand:"Sea level"},
+      {country:"Argentina",capital:"Buenos Aires",aliases:[],continent:"South America",population:2891082,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:31,elevationBand:"Sea level"},
+      {country:"Armenia",capital:"Yerevan",aliases:[],continent:"Asia",population:1144700,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:1002,elevationBand:"High"},
+      {country:"Australia",capital:"Canberra",aliases:[],continent:"Oceania",population:367752,populationBand:"Small",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:571,elevationBand:"Moderate"},
+      {country:"Austria",capital:"Vienna",aliases:[],continent:"Europe",population:1691468,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:171,elevationBand:"Low"},
+      {country:"Azerbaijan",capital:"Baku",aliases:[],continent:"Asia",population:2351300,populationBand:"Large",coastline:"Landlocked",politicalSystem:"Republic",elevation:-23,elevationBand:"Sea level"},
+      {country:"Bahamas",capital:"Nassau",aliases:[],continent:"North America",population:227940,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:5,elevationBand:"Sea level"},
+      {country:"Bahrain",capital:"Manama",aliases:[],continent:"Asia",population:147074,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Absolute monarchy",elevation:12,elevationBand:"Sea level"},
+      {country:"Bangladesh",capital:"Dhaka",aliases:[],continent:"Asia",population:10356500,populationBand:"Megacity",coastline:"Coastal",politicalSystem:"Republic",elevation:23,elevationBand:"Sea level"},
+      {country:"Barbados",capital:"Bridgetown",aliases:[],continent:"North America",population:98511,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:10,elevationBand:"Sea level"},
+      {country:"Belarus",capital:"Minsk",aliases:[],continent:"Europe",population:1742124,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:222,elevationBand:"Low"},
+      {country:"Belgium",capital:"Brussels",aliases:[],continent:"Europe",population:1019022,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:28,elevationBand:"Sea level"},
+      {country:"Belize",capital:"Belmopan",aliases:[],continent:"North America",population:13381,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:56,elevationBand:"Low"},
+      {country:"Benin",capital:"Porto-Novo",aliases:[],continent:"Africa",population:264320,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:20,elevationBand:"Sea level"},
+      {country:"Bhutan",capital:"Thimphu",aliases:[],continent:"Asia",population:98676,populationBand:"Tiny",coastline:"Landlocked",politicalSystem:"Constitutional monarchy",elevation:2320,elevationBand:"Very high"},
+      {country:"Bolivia",capital:"Sucre",aliases:["La Paz"],continent:"South America",population:300000,populationBand:"Small",coastline:"Landlocked",politicalSystem:"Republic",elevation:2810,elevationBand:"Extreme"},
+      {country:"Bosnia and Herzegovina",capital:"Sarajevo",aliases:[],continent:"Europe",population:696731,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:509,elevationBand:"Moderate"},
+      {country:"Botswana",capital:"Gaborone",aliases:[],continent:"Africa",population:246325,populationBand:"Tiny",coastline:"Landlocked",politicalSystem:"Republic",elevation:1011,elevationBand:"High"},
+      {country:"Brazil",capital:"Brasilia",aliases:[],continent:"South America",population:4700000,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:1172,elevationBand:"High"},
+      {country:"Brunei",capital:"Bandar Seri Begawan",aliases:["Bandar"],continent:"Asia",population:280000,populationBand:"Small",coastline:"Coastal",politicalSystem:"Absolute monarchy",elevation:14,elevationBand:"Sea level"},
+      {country:"Bulgaria",capital:"Sofia",aliases:[],continent:"Europe",population:1152556,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:562,elevationBand:"Moderate"},
+      {country:"Burkina Faso",capital:"Ouagadougou",aliases:[],continent:"Africa",population:2415266,populationBand:"Large",coastline:"Landlocked",politicalSystem:"Republic",elevation:299,elevationBand:"Moderate"},
+      {country:"Burundi",capital:"Gitega",aliases:[],continent:"Africa",population:64904,populationBand:"Tiny",coastline:"Landlocked",politicalSystem:"Republic",elevation:1684,elevationBand:"Very high"},
+      {country:"Cambodia",capital:"Phnom Penh",aliases:[],continent:"Asia",population:1573544,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:20,elevationBand:"Sea level"},
+      {country:"Cameroon",capital:"Yaounde",aliases:[],continent:"Africa",population:4400000,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:726,elevationBand:"Moderate"},
+      {country:"Canada",capital:"Ottawa",aliases:[],continent:"North America",population:1017449,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:71,elevationBand:"Low"},
+      {country:"Cape Verde",capital:"Praia",aliases:[],continent:"Africa",population:137868,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:18,elevationBand:"Sea level"},
+      {country:"Central African Republic",capital:"Bangui",aliases:[],continent:"Africa",population:812407,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:351,elevationBand:"Moderate"},
+      {country:"Chad",capital:"N'Djamena",aliases:["Ndjamena"],continent:"Africa",population:1600000,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:298,elevationBand:"Moderate"},
+      {country:"Chile",capital:"Santiago",aliases:[],continent:"South America",population:4837295,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:556,elevationBand:"Moderate"},
+      {country:"China",capital:"Beijing",aliases:["Peking"],continent:"Asia",population:21000000,populationBand:"Megacity",coastline:"Coastal",politicalSystem:"One-party state",elevation:43,elevationBand:"Sea level"},
+      {country:"Colombia",capital:"Bogota",aliases:[],continent:"South America",population:11000000,populationBand:"Megacity",coastline:"Coastal",politicalSystem:"Republic",elevation:2640,elevationBand:"Extreme"},
+      {country:"Comoros",capital:"Moroni",aliases:[],continent:"Africa",population:74749,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:27,elevationBand:"Sea level"},
+      {country:"Costa Rica",capital:"San Jose",aliases:[],continent:"North America",population:1500000,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:1172,elevationBand:"High"},
+      {country:"Croatia",capital:"Zagreb",aliases:[],continent:"Europe",population:663592,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:135,elevationBand:"Low"},
+      {country:"Cuba",capital:"Havana",aliases:[],continent:"North America",population:2163824,populationBand:"Large",coastline:"Coastal",politicalSystem:"One-party state",elevation:41,elevationBand:"Sea level"},
+      {country:"Cyprus",capital:"Nicosia",aliases:[],continent:"Europe",population:200452,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:155,elevationBand:"Low"},
+      {country:"Czechia",capital:"Prague",aliases:["Praha"],continent:"Europe",population:1400000,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:200,elevationBand:"Low"},
+      {country:"Denmark",capital:"Copenhagen",aliases:["Kobenhavn"],continent:"Europe",population:1400000,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:14,elevationBand:"Sea level"},
+      {country:"Djibouti",capital:"Djibouti",aliases:[],continent:"Africa",population:626512,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:6,elevationBand:"Sea level"},
+      {country:"Dominica",capital:"Roseau",aliases:[],continent:"North America",population:16571,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:11,elevationBand:"Sea level"},
+      {country:"Dominican Republic",capital:"Santo Domingo",aliases:[],continent:"North America",population:2201941,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:24,elevationBand:"Sea level"},
+      {country:"DR Congo",capital:"Kinshasa",aliases:[],continent:"Africa",population:16000000,populationBand:"Megacity",coastline:"Coastal",politicalSystem:"Republic",elevation:281,elevationBand:"Moderate"},
+      {country:"Ecuador",capital:"Quito",aliases:[],continent:"South America",population:2781641,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:2854,elevationBand:"Extreme"},
+      {country:"Egypt",capital:"Cairo",aliases:[],continent:"Africa",population:9606916,populationBand:"Very large",coastline:"Coastal",politicalSystem:"Republic",elevation:23,elevationBand:"Sea level"},
+      {country:"El Salvador",capital:"San Salvador",aliases:[],continent:"North America",population:1100000,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:658,elevationBand:"Moderate"},
+      {country:"Equatorial Guinea",capital:"Malabo",aliases:["Ciudad de la Paz"],continent:"Africa",population:300000,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:0,elevationBand:"Sea level"},
+      {country:"Eritrea",capital:"Asmara",aliases:[],continent:"Africa",population:563930,populationBand:"Small",coastline:"Coastal",politicalSystem:"One-party state",elevation:2334,elevationBand:"Very high"},
+      {country:"Estonia",capital:"Tallinn",aliases:[],continent:"Europe",population:394024,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:12,elevationBand:"Sea level"},
+      {country:"Eswatini",capital:"Mbabane",aliases:[],continent:"Africa",population:76218,populationBand:"Tiny",coastline:"Landlocked",politicalSystem:"Absolute monarchy",elevation:1209,elevationBand:"High"},
+      {country:"Ethiopia",capital:"Addis Ababa",aliases:[],continent:"Africa",population:3860000,populationBand:"Large",coastline:"Landlocked",politicalSystem:"Republic",elevation:2405,elevationBand:"Very high"},
+      {country:"Fiji",capital:"Suva",aliases:[],continent:"Oceania",population:77366,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:-9999,elevationBand:"Sea level"},
+      {country:"Finland",capital:"Helsinki",aliases:[],continent:"Europe",population:658864,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:26,elevationBand:"Sea level"},
+      {country:"France",capital:"Paris",aliases:[],continent:"Europe",population:2138551,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:42,elevationBand:"Sea level"},
+      {country:"Gabon",capital:"Libreville",aliases:[],continent:"Africa",population:846090,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:8,elevationBand:"Sea level"},
+      {country:"Gambia",capital:"Banjul",aliases:[],continent:"Africa",population:37274,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:5,elevationBand:"Sea level"},
+      {country:"Georgia",capital:"Tbilisi",aliases:[],continent:"Asia",population:1049498,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:433,elevationBand:"Moderate"},
+      {country:"Germany",capital:"Berlin",aliases:[],continent:"Europe",population:3426354,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:74,elevationBand:"Low"},
+      {country:"Ghana",capital:"Accra",aliases:[],continent:"Africa",population:1963264,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:33,elevationBand:"Sea level"},
+      {country:"Greece",capital:"Athens",aliases:[],continent:"Europe",population:664046,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:70,elevationBand:"Low"},
+      {country:"Grenada",capital:"St. George's",aliases:[],continent:"North America",population:7500,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:6,elevationBand:"Sea level"},
+      {country:"Guatemala",capital:"Guatemala City",aliases:[],continent:"North America",population:994938,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:1508,elevationBand:"Very high"},
+      {country:"Guinea",capital:"Conakry",aliases:[],continent:"Africa",population:1928389,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:13,elevationBand:"Sea level"},
+      {country:"Guinea-Bissau",capital:"Bissau",aliases:[],continent:"Africa",population:439704,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:13,elevationBand:"Sea level"},
+      {country:"Guyana",capital:"Georgetown",aliases:[],continent:"South America",population:235017,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:3,elevationBand:"Sea level"},
+      {country:"Haiti",capital:"Port-au-Prince",aliases:["Port au Prince"],continent:"North America",population:2600000,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:98,elevationBand:"Low"},
+      {country:"Honduras",capital:"Tegucigalpa",aliases:[],continent:"North America",population:850848,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:944,elevationBand:"High"},
+      {country:"Hungary",capital:"Budapest",aliases:[],continent:"Europe",population:1741041,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:104,elevationBand:"Low"},
+      {country:"Iceland",capital:"Reykjavik",aliases:[],continent:"Europe",population:118918,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:37,elevationBand:"Sea level"},
+      {country:"India",capital:"New Delhi",aliases:["Delhi"],continent:"Asia",population:32000000,populationBand:"Megacity",coastline:"Coastal",politicalSystem:"Republic",elevation:216,elevationBand:"Low"},
+      {country:"Indonesia",capital:"Jakarta",aliases:["Nusantara"],continent:"Asia",population:33000000,populationBand:"Megacity",coastline:"Coastal",politicalSystem:"Republic",elevation:8,elevationBand:"Sea level"},
+      {country:"Iran",capital:"Tehran",aliases:[],continent:"Asia",population:7153309,populationBand:"Very large",coastline:"Coastal",politicalSystem:"Theocracy / religious state",elevation:1178,elevationBand:"High"},
+      {country:"Iraq",capital:"Baghdad",aliases:[],continent:"Asia",population:7216000,populationBand:"Very large",coastline:"Coastal",politicalSystem:"Republic",elevation:41,elevationBand:"Sea level"},
+      {country:"Ireland",capital:"Dublin",aliases:[],continent:"Europe",population:1024027,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:17,elevationBand:"Sea level"},
+      {country:"Israel",capital:"Jerusalem",aliases:[],continent:"Asia",population:971800,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:786,elevationBand:"High"},
+      {country:"Italy",capital:"Rome",aliases:["Roma"],continent:"Europe",population:4300000,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:21,elevationBand:"Sea level"},
+      {country:"Ivory Coast",capital:"Yamoussoukro",aliases:["Abidjan"],continent:"Africa",population:360000,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:213,elevationBand:"Low"},
+      {country:"Jamaica",capital:"Kingston",aliases:[],continent:"North America",population:937700,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:65,elevationBand:"Low"},
+      {country:"Japan",capital:"Tokyo",aliases:[],continent:"Asia",population:9733276,populationBand:"Very large",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:44,elevationBand:"Sea level"},
+      {country:"Jordan",capital:"Amman",aliases:[],continent:"Asia",population:1275857,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:757,elevationBand:"High"},
+      {country:"Kazakhstan",capital:"Astana",aliases:["Nur-Sultan","Nur Sultan"],continent:"Asia",population:1400000,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:347,elevationBand:"Moderate"},
+      {country:"Kenya",capital:"Nairobi",aliases:[],continent:"Africa",population:4397073,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:1684,elevationBand:"Very high"},
+      {country:"Kiribati",capital:"South Tarawa",aliases:["Tarawa"],continent:"Oceania",population:64000,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:3,elevationBand:"Sea level"},
+      {country:"Kuwait",capital:"Kuwait City",aliases:[],continent:"Asia",population:60064,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:11,elevationBand:"Sea level"},
+      {country:"Kyrgyzstan",capital:"Bishkek",aliases:[],continent:"Asia",population:900000,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:767,elevationBand:"High"},
+      {country:"Laos",capital:"Vientiane",aliases:[],continent:"Asia",population:840940,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"One-party state",elevation:174,elevationBand:"Low"},
+      {country:"Latvia",capital:"Riga",aliases:[],continent:"Europe",population:742572,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:6,elevationBand:"Sea level"},
+      {country:"Lebanon",capital:"Beirut",aliases:[],continent:"Asia",population:1916100,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:40,elevationBand:"Sea level"},
+      {country:"Lesotho",capital:"Maseru",aliases:[],continent:"Africa",population:359753,populationBand:"Small",coastline:"Landlocked",politicalSystem:"Constitutional monarchy",elevation:1552,elevationBand:"Very high"},
+      {country:"Liberia",capital:"Monrovia",aliases:[],continent:"Africa",population:1542549,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:32,elevationBand:"Sea level"},
+      {country:"Libya",capital:"Tripoli",aliases:[],continent:"Africa",population:1302947,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Other / transitional",elevation:15,elevationBand:"Sea level"},
+      {country:"Liechtenstein",capital:"Vaduz",aliases:[],continent:"Europe",population:5197,populationBand:"Tiny",coastline:"Landlocked",politicalSystem:"Constitutional monarchy",elevation:465,elevationBand:"Moderate"},
+      {country:"Lithuania",capital:"Vilnius",aliases:[],continent:"Europe",population:542366,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:98,elevationBand:"Low"},
+      {country:"Luxembourg",capital:"Luxembourg",aliases:[],continent:"Europe",population:76684,populationBand:"Tiny",coastline:"Landlocked",politicalSystem:"Constitutional monarchy",elevation:259,elevationBand:"Moderate"},
+      {country:"Madagascar",capital:"Antananarivo",aliases:[],continent:"Africa",population:1349501,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:1274,elevationBand:"High"},
+      {country:"Malawi",capital:"Lilongwe",aliases:[],continent:"Africa",population:1115815,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:1056,elevationBand:"High"},
+      {country:"Malaysia",capital:"Kuala Lumpur",aliases:["Putrajaya"],continent:"Asia",population:8400000,populationBand:"Very large",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:66,elevationBand:"Low"},
+      {country:"Maldives",capital:"Male",aliases:[],continent:"Asia",population:210000,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:2,elevationBand:"Sea level"},
+      {country:"Mali",capital:"Bamako",aliases:[],continent:"Africa",population:4227569,populationBand:"Large",coastline:"Landlocked",politicalSystem:"Republic",elevation:374,elevationBand:"Moderate"},
+      {country:"Malta",capital:"Valletta",aliases:[],continent:"Europe",population:6794,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:44,elevationBand:"Sea level"},
+      {country:"Marshall Islands",capital:"Majuro",aliases:[],continent:"Oceania",population:25400,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:6,elevationBand:"Sea level"},
+      {country:"Mauritania",capital:"Nouakchott",aliases:[],continent:"Africa",population:1184530,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:10,elevationBand:"Sea level"},
+      {country:"Mauritius",capital:"Port Louis",aliases:[],continent:"Africa",population:155226,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:3,elevationBand:"Sea level"},
+      {country:"Mexico",capital:"Mexico City",aliases:["Ciudad de Mexico"],continent:"North America",population:22000000,populationBand:"Megacity",coastline:"Coastal",politicalSystem:"Republic",elevation:2240,elevationBand:"Very high"},
+      {country:"Micronesia",capital:"Palikir",aliases:[],continent:"Oceania",population:7000,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:59,elevationBand:"Low"},
+      {country:"Moldova",capital:"Chisinau",aliases:["Kishinev"],continent:"Europe",population:700000,populationBand:"Small",coastline:"Landlocked",politicalSystem:"Republic",elevation:85,elevationBand:"Low"},
+      {country:"Monaco",capital:"Monaco",aliases:[],continent:"Europe",population:32965,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:-9999,elevationBand:"Sea level"},
+      {country:"Mongolia",capital:"Ulaanbaatar",aliases:["Ulan Bator","Ulaan Baatar"],continent:"Asia",population:1700000,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:1350,elevationBand:"High"},
+      {country:"Montenegro",capital:"Podgorica",aliases:[],continent:"Europe",population:236852,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:49,elevationBand:"Sea level"},
+      {country:"Morocco",capital:"Rabat",aliases:[],continent:"Africa",population:1655753,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:46,elevationBand:"Sea level"},
+      {country:"Mozambique",capital:"Maputo",aliases:[],continent:"Africa",population:1254837,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:70,elevationBand:"Low"},
+      {country:"Myanmar",capital:"Naypyidaw",aliases:["Nay Pyi Taw","Naypyitaw","Rangoon","Yangon"],continent:"Asia",population:1200000,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Other / transitional",elevation:115,elevationBand:"Low"},
+      {country:"Namibia",capital:"Windhoek",aliases:[],continent:"Africa",population:386219,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:1700,elevationBand:"Very high"},
+      {country:"Nauru",capital:"Yaren",aliases:[],continent:"Oceania",population:750,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:25,elevationBand:"Sea level"},
+      {country:"Nepal",capital:"Kathmandu",aliases:[],continent:"Asia",population:1442271,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:1317,elevationBand:"High"},
+      {country:"Netherlands",capital:"Amsterdam",aliases:["The Hague","Den Haag"],continent:"Europe",population:2500000,populationBand:"Large",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:2,elevationBand:"Sea level"},
+      {country:"New Zealand",capital:"Wellington",aliases:[],continent:"Oceania",population:381900,populationBand:"Small",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:31,elevationBand:"Sea level"},
+      {country:"Nicaragua",capital:"Managua",aliases:[],continent:"North America",population:973087,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:108,elevationBand:"Low"},
+      {country:"Niger",capital:"Niamey",aliases:[],continent:"Africa",population:1323691,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:206,elevationBand:"Low"},
+      {country:"Nigeria",capital:"Abuja",aliases:[],continent:"Africa",population:2690000,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:476,elevationBand:"Moderate"},
+      {country:"North Korea",capital:"Pyongyang",aliases:[],continent:"Asia",population:3222000,populationBand:"Large",coastline:"Coastal",politicalSystem:"One-party state",elevation:43,elevationBand:"Sea level"},
+      {country:"North Macedonia",capital:"Skopje",aliases:[],continent:"Europe",population:474889,populationBand:"Small",coastline:"Landlocked",politicalSystem:"Republic",elevation:247,elevationBand:"Low"},
+      {country:"Norway",capital:"Oslo",aliases:[],continent:"Europe",population:1082575,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:26,elevationBand:"Sea level"},
+      {country:"Oman",capital:"Muscat",aliases:[],continent:"Asia",population:797000,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Absolute monarchy",elevation:14,elevationBand:"Sea level"},
+      {country:"Pakistan",capital:"Islamabad",aliases:[],continent:"Asia",population:601600,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:579,elevationBand:"Moderate"},
+      {country:"Palau",capital:"Ngerulmud",aliases:["Melekeok"],continent:"Oceania",population:300,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:55,elevationBand:"Low"},
+      {country:"Palestine",capital:"Ramallah",aliases:[],continent:"Asia",population:390000,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:872,elevationBand:"High"},
+      {country:"Panama",capital:"Panama City",aliases:[],continent:"North America",population:408168,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:17,elevationBand:"Sea level"},
+      {country:"Papua New Guinea",capital:"Port Moresby",aliases:[],continent:"Oceania",population:283733,populationBand:"Small",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:25,elevationBand:"Sea level"},
+      {country:"Paraguay",capital:"Asuncion",aliases:[],continent:"South America",population:3300000,populationBand:"Large",coastline:"Landlocked",politicalSystem:"Republic",elevation:43,elevationBand:"Sea level"},
+      {country:"Peru",capital:"Lima",aliases:[],continent:"South America",population:7737002,populationBand:"Very large",coastline:"Coastal",politicalSystem:"Republic",elevation:152,elevationBand:"Low"},
+      {country:"Philippines",capital:"Manila",aliases:[],continent:"Asia",population:1600000,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:13,elevationBand:"Sea level"},
+      {country:"Poland",capital:"Warsaw",aliases:["Warszawa"],continent:"Europe",population:3100000,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:100,elevationBand:"Low"},
+      {country:"Portugal",capital:"Lisbon",aliases:[],continent:"Europe",population:517802,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:68,elevationBand:"Low"},
+      {country:"Qatar",capital:"Doha",aliases:[],continent:"Asia",population:344939,populationBand:"Small",coastline:"Coastal",politicalSystem:"Absolute monarchy",elevation:11,elevationBand:"Sea level"},
+      {country:"Republic of the Congo",capital:"Brazzaville",aliases:[],continent:"Africa",population:1982000,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:284,elevationBand:"Moderate"},
+      {country:"Romania",capital:"Bucharest",aliases:[],continent:"Europe",population:1877155,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:83,elevationBand:"Low"},
+      {country:"Russia",capital:"Moscow",aliases:[],continent:"Europe",population:10381222,populationBand:"Megacity",coastline:"Coastal",politicalSystem:"Republic",elevation:155,elevationBand:"Low"},
+      {country:"Rwanda",capital:"Kigali",aliases:[],continent:"Africa",population:1132686,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:1542,elevationBand:"Very high"},
+      {country:"Saint Kitts and Nevis",capital:"Basseterre",aliases:[],continent:"North America",population:12920,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:-22,elevationBand:"Sea level"},
+      {country:"Saint Lucia",capital:"Castries",aliases:[],continent:"North America",population:20000,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:119,elevationBand:"Low"},
+      {country:"Saint Vincent and the Grenadines",capital:"Kingstown",aliases:[],continent:"North America",population:24518,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:9,elevationBand:"Sea level"},
+      {country:"Samoa",capital:"Apia",aliases:[],continent:"Oceania",population:40407,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:9,elevationBand:"Sea level"},
+      {country:"San Marino",capital:"City of San Marino",aliases:[],continent:"Europe",population:4500,populationBand:"Tiny",coastline:"Landlocked",politicalSystem:"Republic",elevation:683,elevationBand:"Moderate"},
+      {country:"Sao Tome and Principe",capital:"Sao Tome",aliases:[],continent:"Africa",population:80000,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:137,elevationBand:"Low"},
+      {country:"Saudi Arabia",capital:"Riyadh",aliases:[],continent:"Asia",population:4205961,populationBand:"Large",coastline:"Coastal",politicalSystem:"Absolute monarchy",elevation:612,elevationBand:"Moderate"},
+      {country:"Senegal",capital:"Dakar",aliases:[],continent:"Africa",population:2646503,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:12,elevationBand:"Sea level"},
+      {country:"Serbia",capital:"Belgrade",aliases:[],continent:"Europe",population:1273651,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:120,elevationBand:"Low"},
+      {country:"Seychelles",capital:"Victoria",aliases:[],continent:"Africa",population:22881,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:4,elevationBand:"Sea level"},
+      {country:"Sierra Leone",capital:"Freetown",aliases:[],continent:"Africa",population:802639,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:38,elevationBand:"Sea level"},
+      {country:"Singapore",capital:"Singapore",aliases:[],continent:"Asia",population:5638700,populationBand:"Very large",coastline:"Coastal",politicalSystem:"Republic",elevation:23,elevationBand:"Sea level"},
+      {country:"Slovakia",capital:"Bratislava",aliases:[],continent:"Europe",population:423737,populationBand:"Small",coastline:"Landlocked",politicalSystem:"Republic",elevation:157,elevationBand:"Low"},
+      {country:"Slovenia",capital:"Ljubljana",aliases:[],continent:"Europe",population:272220,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:295,elevationBand:"Moderate"},
+      {country:"Solomon Islands",capital:"Honiara",aliases:[],continent:"Oceania",population:56298,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:49,elevationBand:"Sea level"},
+      {country:"Somalia",capital:"Mogadishu",aliases:[],continent:"Africa",population:2587183,populationBand:"Large",coastline:"Coastal",politicalSystem:"Other / transitional",elevation:12,elevationBand:"Sea level"},
+      {country:"South Africa",capital:"Pretoria",aliases:["Cape Town","Bloemfontein"],continent:"Africa",population:2900000,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:1339,elevationBand:"High"},
+      {country:"South Korea",capital:"Seoul",aliases:[],continent:"Asia",population:10349312,populationBand:"Megacity",coastline:"Coastal",politicalSystem:"Republic",elevation:38,elevationBand:"Sea level"},
+      {country:"South Sudan",capital:"Juba",aliases:[],continent:"Africa",population:450000,populationBand:"Small",coastline:"Landlocked",politicalSystem:"Other / transitional",elevation:518,elevationBand:"Moderate"},
+      {country:"Spain",capital:"Madrid",aliases:[],continent:"Europe",population:3255944,populationBand:"Large",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:665,elevationBand:"Moderate"},
+      {country:"Sri Lanka",capital:"Sri Jayawardenepura Kotte",aliases:["Colombo","Kotte"],continent:"Asia",population:115000,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:14,elevationBand:"Sea level"},
+      {country:"Sudan",capital:"Khartoum",aliases:[],continent:"Africa",population:1974647,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Other / transitional",elevation:381,elevationBand:"Moderate"},
+      {country:"Suriname",capital:"Paramaribo",aliases:[],continent:"South America",population:223757,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:5,elevationBand:"Sea level"},
+      {country:"Sweden",capital:"Stockholm",aliases:[],continent:"Europe",population:1515017,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:17,elevationBand:"Sea level"},
+      {country:"Switzerland",capital:"Bern",aliases:[],continent:"Europe",population:121631,populationBand:"Tiny",coastline:"Landlocked",politicalSystem:"Republic",elevation:549,elevationBand:"Moderate"},
+      {country:"Syria",capital:"Damascus",aliases:[],continent:"Asia",population:1569394,populationBand:"Medium",coastline:"Coastal",politicalSystem:"One-party state",elevation:701,elevationBand:"Moderate"},
+      {country:"Tajikistan",capital:"Dushanbe",aliases:[],continent:"Asia",population:679400,populationBand:"Small",coastline:"Landlocked",politicalSystem:"Republic",elevation:767,elevationBand:"High"},
+      {country:"Tanzania",capital:"Dodoma",aliases:["Dar es Salaam"],continent:"Africa",population:3200000,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:1120,elevationBand:"High"},
+      {country:"Thailand",capital:"Bangkok",aliases:[],continent:"Asia",population:5104476,populationBand:"Very large",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:12,elevationBand:"Sea level"},
+      {country:"Timor-Leste",capital:"Dili",aliases:[],continent:"Asia",population:150000,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:3,elevationBand:"Sea level"},
+      {country:"Togo",capital:"Lome",aliases:[],continent:"Africa",population:2188376,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:13,elevationBand:"Sea level"},
+      {country:"Tonga",capital:"Nuku'alofa",aliases:["Nukualofa"],continent:"Oceania",population:24000,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:3,elevationBand:"Sea level"},
+      {country:"Trinidad and Tobago",capital:"Port of Spain",aliases:[],continent:"North America",population:49031,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:21,elevationBand:"Sea level"},
+      {country:"Tunisia",capital:"Tunis",aliases:[],continent:"Africa",population:693210,populationBand:"Small",coastline:"Coastal",politicalSystem:"Republic",elevation:23,elevationBand:"Sea level"},
+      {country:"Turkey",capital:"Ankara",aliases:[],continent:"Asia",population:3517182,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:850,elevationBand:"High"},
+      {country:"Turkmenistan",capital:"Ashgabat",aliases:[],continent:"Asia",population:1030063,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:219,elevationBand:"Low"},
+      {country:"Tuvalu",capital:"Funafuti",aliases:[],continent:"Oceania",population:6320,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:7,elevationBand:"Sea level"},
+      {country:"Uganda",capital:"Kampala",aliases:[],continent:"Africa",population:1680600,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:1223,elevationBand:"High"},
+      {country:"Ukraine",capital:"Kyiv",aliases:["Kiev"],continent:"Europe",population:3600000,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:179,elevationBand:"Low"},
+      {country:"United Arab Emirates",capital:"Abu Dhabi",aliases:[],continent:"Asia",population:1807000,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Absolute monarchy",elevation:6,elevationBand:"Sea level"},
+      {country:"United Kingdom",capital:"London",aliases:[],continent:"Europe",population:8961989,populationBand:"Very large",coastline:"Coastal",politicalSystem:"Constitutional monarchy",elevation:25,elevationBand:"Sea level"},
+      {country:"United States",capital:"Washington",aliases:["Washington DC","Washington, D.C.","D.C.","DC"],continent:"North America",population:6300000,populationBand:"Very large",coastline:"Coastal",politicalSystem:"Republic",elevation:7,elevationBand:"Sea level"},
+      {country:"Uruguay",capital:"Montevideo",aliases:[],continent:"South America",population:1270737,populationBand:"Medium",coastline:"Coastal",politicalSystem:"Republic",elevation:34,elevationBand:"Sea level"},
+      {country:"Uzbekistan",capital:"Tashkent",aliases:[],continent:"Asia",population:1978028,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:424,elevationBand:"Moderate"},
+      {country:"Vanuatu",capital:"Port Vila",aliases:[],continent:"Oceania",population:35901,populationBand:"Tiny",coastline:"Coastal",politicalSystem:"Republic",elevation:10,elevationBand:"Sea level"},
+      {country:"Vatican City",capital:"Vatican City",aliases:["Holy See"],continent:"Europe",population:800,populationBand:"Tiny",coastline:"Landlocked",politicalSystem:"Theocracy / religious state",elevation:75,elevationBand:"Low"},
+      {country:"Venezuela",capital:"Caracas",aliases:[],continent:"South America",population:3000000,populationBand:"Large",coastline:"Coastal",politicalSystem:"Republic",elevation:887,elevationBand:"High"},
+      {country:"Vietnam",capital:"Hanoi",aliases:[],continent:"Asia",population:8053663,populationBand:"Very large",coastline:"Coastal",politicalSystem:"One-party state",elevation:10,elevationBand:"Sea level"},
+      {country:"Yemen",capital:"Sana'a",aliases:["Sanaa","Sana"],continent:"Asia",population:3300000,populationBand:"Large",coastline:"Coastal",politicalSystem:"Other / transitional",elevation:2250,elevationBand:"Very high"},
+      {country:"Zambia",capital:"Lusaka",aliases:[],continent:"Africa",population:2212301,populationBand:"Large",coastline:"Landlocked",politicalSystem:"Republic",elevation:1277,elevationBand:"High"},
+      {country:"Zimbabwe",capital:"Harare",aliases:[],continent:"Africa",population:1542813,populationBand:"Medium",coastline:"Landlocked",politicalSystem:"Republic",elevation:1494,elevationBand:"High"}
     ];
 
     const populationRanks = {
@@ -842,11 +1067,13 @@
     const categoryModalDescription = document.querySelector("#category-modal-description");
     const categoryModalList = document.querySelector("#category-modal-list");
     const categoryModalClose = document.querySelector("#category-modal-close");
+    const winCelebration = document.querySelector("#win-celebration");
 
     let answer;
     let guesses;
     let gameOver;
     let activeInfoTrigger;
+    let celebrationTimer;
 
     function normalize(value) {
       return value
@@ -898,6 +1125,49 @@
       message.textContent = text;
     }
 
+    function clearWinCelebration() {
+      window.clearTimeout(celebrationTimer);
+      winCelebration.classList.remove("active");
+      winCelebration.innerHTML = "";
+      message.classList.remove("celebrate");
+      answerStrip.classList.remove("celebrate");
+    }
+
+    function playWinCelebration() {
+      clearWinCelebration();
+      message.classList.add("celebrate");
+      answerStrip.classList.add("celebrate");
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        celebrationTimer = window.setTimeout(clearWinCelebration, 1800);
+        return;
+      }
+
+      const colors = ["#2d7d54", "#9b6b1f", "#e4f3e9", "#fff2cf", "#356a8b"];
+      const fragment = document.createDocumentFragment();
+
+      for (let index = 0; index < 28; index += 1) {
+        const particle = document.createElement("span");
+        const angle = (Math.PI * 2 * index) / 28;
+        const distance = 130 + ((index % 7) * 24);
+        const x = Math.cos(angle) * distance;
+        const y = Math.sin(angle) * distance;
+
+        particle.className = "win-particle";
+        particle.style.setProperty("--x", `${x}px`);
+        particle.style.setProperty("--y", `${y}px`);
+        particle.style.setProperty("--size", `${7 + (index % 4) * 3}px`);
+        particle.style.setProperty("--delay", `${(index % 5) * 28}ms`);
+        particle.style.setProperty("--rotation", `${index * 31}deg`);
+        particle.style.setProperty("--color", colors[index % colors.length]);
+        fragment.appendChild(particle);
+      }
+
+      winCelebration.appendChild(fragment);
+      winCelebration.classList.add("active");
+      celebrationTimer = window.setTimeout(clearWinCelebration, 1800);
+    }
+
     function buildMeter() {
       meter.innerHTML = "";
       for (let index = 0; index < MAX_GUESSES; index += 1) {
@@ -945,7 +1215,7 @@
       return [
         sameDifferentClue("Continent", "continent", guess.continent, answer.continent),
         comparisonClue("Population", "population", guess.populationBand, answer.populationBand, populationRanks, "", guess.population, answer.population),
-        sameDifferentClue("Language", "language", guess.languageFamily, answer.languageFamily),
+        sameDifferentClue("Coastline", "coastline", guess.coastline, answer.coastline),
         sameDifferentClue("Politics", "politics", guess.politicalSystem, answer.politicalSystem),
         comparisonClue("Elevation", "elevation", guess.elevationBand, answer.elevationBand, elevationRanks, " m", guess.elevation, answer.elevation)
       ];
@@ -1006,7 +1276,7 @@
       answerStrip.classList.add("visible");
       answerStrip.innerHTML = `
         <b>${answer.capital}, ${answer.country}</b>
-        <span>${answer.continent} &middot; ${answer.languageFamily} &middot; ${answer.politicalSystem} &middot; ${categoryLabel("population", answer.populationBand)} population &middot; ${categoryLabel("elevation", answer.elevationBand)} elevation</span>
+        <span>${answer.continent} &middot; ${answer.coastline} &middot; ${answer.politicalSystem} &middot; ${categoryLabel("population", answer.populationBand)} population &middot; ${categoryLabel("elevation", answer.elevationBand)} elevation</span>
       `;
     }
 
@@ -1057,6 +1327,7 @@
 
       if (didWin) {
         setMessage(`Correct. You found ${answer.capital} in ${guesses.length} ${guesses.length === 1 ? "guess" : "guesses"}.`, "win");
+        playWinCelebration();
       } else {
         setMessage(`Out of guesses. The mystery capital was ${answer.capital}.`, "loss");
       }
@@ -1109,10 +1380,11 @@
       input.disabled = false;
       guessButton.disabled = false;
       input.value = "";
+      clearWinCelebration();
       hideAnswer();
       buildMeter();
       renderHistory();
-      setMessage("Choose a capital from the dataset. Aliases like Kiev and Roma are accepted.");
+      setMessage("Choose a capital from the world dataset. Aliases like Kiev and Roma are accepted.");
       input.focus();
     }
 
