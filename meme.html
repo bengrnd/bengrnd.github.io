@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meme Match</title>
+
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --surface-soft: #eef5f3;
+      --text: #16181d;
+      --muted: #5f6672;
+      --line: #d8dde4;
+      --accent: #0f766e;
+      --accent-dark: #0b5f59;
+      --accent-soft: #d9f2ee;
+      --danger: #9f2f2f;
+      --danger-soft: #fde8e8;
+      --shadow: 0 20px 55px rgba(22, 24, 29, 0.11);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+      color: var(--text);
+      background:
+        linear-gradient(135deg, rgba(15, 118, 110, 0.12), transparent 34rem),
+        linear-gradient(315deg, rgba(194, 119, 58, 0.13), transparent 30rem),
+        var(--bg);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    button:focus-visible {
+      outline: 4px solid rgba(15, 118, 110, 0.28);
+      outline-offset: 4px;
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 56px;
+    }
+
+    .shell {
+      display: grid;
+      gap: 24px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 12px;
+      max-width: 760px;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--accent-dark);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(42px, 8vw, 84px);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    .intro {
+      max-width: 660px;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 20px);
+    }
+
+    .game {
+      display: grid;
+      gap: 22px;
+      padding: clamp(18px, 3vw, 30px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .caption-card {
+      display: grid;
+      gap: 8px;
+      padding: clamp(18px, 3vw, 26px);
+      border: 1px solid rgba(15, 118, 110, 0.2);
+      border-radius: var(--radius);
+      background: var(--surface-soft);
+    }
+
+    .caption-label {
+      margin: 0;
+      color: var(--accent-dark);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .caption {
+      min-height: 2.8em;
+      margin: 0;
+      font-size: clamp(24px, 4vw, 42px);
+      font-weight: 800;
+      line-height: 1.16;
+      overflow-wrap: break-word;
+    }
+
+    .status {
+      min-height: 1.6em;
+      margin: 0;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .choice {
+      display: grid;
+      gap: 12px;
+      width: 100%;
+      min-height: 100%;
+      padding: 12px;
+      border: 2px solid transparent;
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 10px 24px rgba(22, 24, 29, 0.08);
+      cursor: pointer;
+      transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+      text-align: left;
+    }
+
+    .choice:hover:not(:disabled) {
+      border-color: rgba(15, 118, 110, 0.4);
+      box-shadow: 0 16px 32px rgba(22, 24, 29, 0.13);
+      transform: translateY(-2px);
+    }
+
+    .choice:disabled {
+      cursor: default;
+    }
+
+    .choice.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: 0 18px 36px rgba(15, 118, 110, 0.18);
+    }
+
+    .image-frame {
+      display: grid;
+      aspect-ratio: 4 / 3;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 6px;
+      background: #e7ebef;
+    }
+
+    .image-frame img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .choice-name {
+      min-height: 2.7em;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .primary-button,
+    .secondary-button {
+      min-height: 44px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .primary-button {
+      border: 1px solid var(--accent-dark);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .primary-button:hover {
+      background: var(--accent-dark);
+    }
+
+    .secondary-button {
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: var(--text);
+    }
+
+    .secondary-button:hover {
+      border-color: var(--accent);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .message {
+      padding: 18px;
+      border-radius: var(--radius);
+      background: #ffffff;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .message.error {
+      border: 1px solid rgba(159, 47, 47, 0.28);
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        width: min(100% - 24px, 1120px);
+        padding-top: 22px;
+      }
+
+      .choices {
+        grid-template-columns: 1fr;
+      }
+
+      .choice {
+        padding: 10px;
+      }
+
+      .choice-name {
+        min-height: auto;
+      }
+
+      .actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .primary-button,
+      .secondary-button {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <div class="shell">
+      <header class="hero">
+        <p class="eyebrow">Pick the funniest fit</p>
+        <h1>Meme Match</h1>
+        <p class="intro">
+          Match a caption with one of three raw meme templates. No generated captions, no overlays, just instinct.
+        </p>
+      </header>
+
+      <section class="game" aria-label="Meme Match game">
+        <div id="loadingState" class="message" aria-live="polite">Loading meme templates...</div>
+
+        <div id="errorState" class="message error hidden" aria-live="polite">
+          <p id="errorMessage">Could not load meme templates.</p>
+          <button id="retryButton" class="secondary-button" type="button">Retry</button>
+        </div>
+
+        <div id="gameBoard" class="hidden">
+          <div class="caption-card">
+            <p class="caption-label">Caption card</p>
+            <p id="captionText" class="caption"></p>
+          </div>
+
+          <p id="statusText" class="status" aria-live="polite"></p>
+
+          <div id="choices" class="choices" aria-label="Meme template choices"></div>
+
+          <div class="actions">
+            <p id="resultText" class="status" aria-live="polite"></p>
+            <div class="action-buttons">
+              <button id="rerollButton" class="secondary-button" type="button">New pictures</button>
+              <button id="nextButton" class="primary-button hidden" type="button">Next round</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const API_URL = "https://api.imgflip.com/get_memes";
+
+    const captions = [
+      "When the meeting could have been an email, but now it has a breakout room.",
+      "Me pretending I understood the instructions after reading them once.",
+      "When your friend says they have a quick story and it starts three years ago.",
+      "Opening the fridge for the fifth time like new snacks might have spawned.",
+      "When the group chat solves a crisis with one badly timed joke.",
+      "Me after doing one productive thing and calling it a comeback.",
+      "When the Wi-Fi reconnects and everyone acts like civilization has returned.",
+      "Trying to look calm while every browser tab is screaming.",
+      "When your plan works, but for reasons nobody should investigate.",
+      "Me choosing the most dramatic option for a very minor inconvenience.",
+      "When the deadline is tomorrow and your brain discovers interior design.",
+      "That moment when the recipe says prep time is ten minutes and you are still chopping.",
+      "When someone says 'no pressure' and immediately adds pressure.",
+      "Me refreshing the tracking page like I can personally move the package.",
+      "When you finally sit down and remember the thing you forgot upstairs.",
+      "When the spreadsheet formula works on the first try.",
+      "Me trying to explain a simple problem I made complicated.",
+      "When the weekend has plans for you before you have plans for it.",
+      "When you hear your own good advice and decide to ignore it.",
+      "Me acting surprised that staying up late made the morning worse.",
+      "When the waiter says 'enjoy' and you reply 'you too'.",
+      "Me opening one email and needing a recovery period.",
+      "When you clean one corner of the room and call it a lifestyle change.",
+      "Trying to remember why I walked into this room.",
+      "When your phone is at 1% and suddenly every app has a notification.",
+      "Me after saying 'I'll just rest my eyes' at 8:30 p.m.",
+      "When the instructions say 'simple assembly' and there are seventeen mystery screws.",
+      "That feeling when the coffee starts working halfway through a bad decision.",
+      "When everyone is calm but you have already mentally evacuated.",
+      "Me treating a minor inconvenience like a full season finale.",
+      "When you accidentally make eye contact with someone after eavesdropping.",
+      "Me waiting for the microwave like it is a live sporting event.",
+      "When you say 'one more episode' and the sun disagrees.",
+      "Trying to act normal after sending a message to the wrong chat.",
+      "When the group project becomes a solo career.",
+      "Me after learning one fact and becoming impossible to be around.",
+      "When the password requirements reject your entire personality.",
+      "Me checking my bank account after a weekend of tiny purchases.",
+      "When the playlist shuffle understands the assignment.",
+      "When the playlist shuffle absolutely does not understand the assignment.",
+      "Me deciding to reorganize my life instead of answering one text.",
+      "When the elevator stops on every floor except yours.",
+      "When your food arrives and everyone suddenly wants a bite.",
+      "Me trying to be mysterious but oversharing immediately.",
+      "When your alarm goes off and you negotiate with reality.",
+      "Me after buying a planner and assuming my life is fixed.",
+      "When someone asks a question I prepared for yesterday, not today.",
+      "Trying to look busy while a file downloads.",
+      "When the app updates and moves the only button you knew.",
+      "Me making a budget and then discovering snacks exist.",
+      "When you finally remember the perfect comeback three days later.",
+      "When autocorrect turns a normal sentence into a legal incident.",
+      "Me pretending the laundry in the chair is part of the furniture.",
+      "When your brain starts a new hobby at midnight.",
+      "Me after saying 'quick call' and opening a calendar invite for one hour.",
+      "When the first sip of water at 2 a.m. tastes like a life reset.",
+      "When you leave the house and immediately wonder if everything is on fire.",
+      "Me trying to read terms and conditions like I have a legal department.",
+      "When the delivery driver is nearby but time becomes abstract.",
+      "Me after taking one personality quiz and making it my brand.",
+      "When the printer works and nobody knows why.",
+      "When the printer does not work and everyone knows why.",
+      "Me quietly hoping someone else asks the obvious question.",
+      "When you start a sentence and trust your brain to finish it.",
+      "Trying to act casual after tripping over absolutely nothing.",
+      "When your friend says 'be honest' and you prepare a diplomatic statement.",
+      "Me saving a file as final_final_REAL_final.",
+      "When you find money in an old coat and become financially confident.",
+      "When you open the camera app by accident and meet your true self.",
+      "Me after one compliment from a stranger.",
+      "When the restaurant menu is too big and your identity collapses.",
+      "Trying to choose a movie before everyone loses the will to live.",
+      "When someone says 'we need to talk' and your mind builds a courtroom.",
+      "Me answering 'no worries' while collecting worries.",
+      "When you have plans later, so the whole day is legally unusable.",
+      "Me after remembering I own leftovers.",
+      "When you successfully parallel park and expect applause.",
+      "When the software says 'minor update' and changes everything.",
+      "Me trying to explain why I need eleven tabs for one task.",
+      "When your notes from yesterday say 'fix this' and nothing else.",
+      "When you drink enough water and briefly become a health influencer.",
+      "Me entering a room with confidence and zero idea what happens next.",
+      "When the meeting ends five minutes early and morale spikes.",
+      "When a website asks if you accept cookies and you just want socks.",
+      "Me after deleting one photo and expecting more storage.",
+      "When you plug in USB correctly on the first try.",
+      "When the group chat goes silent after your joke.",
+      "Me pretending I am not waiting for someone to notice my new haircut.",
+      "When the recipe calls for one clove of garlic and you make an executive decision.",
+      "When you remember tomorrow is Monday in the middle of Sunday.",
+      "Me opening the weather app like I can appeal the forecast.",
+      "When your package says 'out for delivery' and your entire schedule changes.",
+      "When someone starts a sentence with 'fun fact' and it is not fun.",
+      "Me trying to unsubscribe from emails with the patience of a saint.",
+      "When your computer restarts and you realize what 'unsaved' means.",
+      "When you find the exact meme for a feeling you could not explain.",
+      "Me after using a keyboard shortcut successfully.",
+      "When a child asks a simple question and exposes the whole system.",
+      "When you see yourself on a video call before mentally preparing.",
+      "Me trying to be spontaneous within a carefully planned schedule.",
+      "When the restaurant says the kitchen closes in five minutes.",
+      "When the office snack table gets refilled.",
+      "Me starting a new document with a title and calling it progress.",
+      "When your headphones connect to the wrong device at full volume.",
+      "When someone says 'circle back' and the circle never ends.",
+      "Me after one minor success, drafting the acceptance speech.",
+      "When you say 'I'll remember that' with no supporting evidence.",
+      "When your favorite mug is dirty and the day is compromised.",
+      "Me trying to act surprised at a plot twist I read online.",
+      "When you finally close all your tabs and feel empty.",
+      "When someone asks what you did this weekend and the answer is laundry diplomacy.",
+      "Me watching the loading bar move from 98% to 99% for ten minutes.",
+      "When you buy vegetables and feel spiritually advanced.",
+      "When those vegetables become fridge decorations.",
+      "Me trying to sound professional while my chair slowly sinks.",
+      "When you realize mute was not on.",
+      "When you realize mute was on and your best joke was wasted.",
+      "Me after finding a typo immediately after sending.",
+      "When the hotel breakfast has tiny pastries.",
+      "When your friend is late but brings snacks.",
+      "Me reading an old message and judging my past punctuation.",
+      "When the weekend disappears in a suspiciously legal way.",
+      "When you solve a problem by turning it off and on again.",
+      "Me trying to fold a fitted sheet with dignity.",
+      "When the 'quick errand' becomes a three-location quest.",
+      "When you hear your name from another room and become alert.",
+      "Me after saying 'I'm flexible' and receiving too many options.",
+      "When someone shares their screen and chaos enters the chat.",
+      "When you find the remote after blaming everyone.",
+      "Me deciding to start fresh on a random Tuesday.",
+      "When you make eye contact with your pet while doing something embarrassing.",
+      "When the captcha asks if you are human and you need a second.",
+      "Me after successfully cancelling a subscription.",
+      "When the leftovers taste better than the original meal.",
+      "When you try to nap and your brain opens the archive.",
+      "Me acting casual while waiting for a reply.",
+      "When someone says 'let's take a quick look' and opens a spreadsheet.",
+      "When the group decides where to eat in under five minutes.",
+      "Me when the charger only works at one sacred angle.",
+      "When the calendar reminder appears and chooses violence.",
+      "When you remember a deadline because of pure fear.",
+      "Me after turning down the brightness and calling it self-care.",
+      "When you say 'interesting' because you cannot say what you are thinking.",
+      "When the first pancake confirms the pan was not ready.",
+      "Me trying to leave a party without launching a press conference.",
+      "When the chair makes a sound during a serious meeting.",
+      "When you check the time and immediately forget it.",
+      "Me opening a document named 'new new version 2 copy'.",
+      "When someone asks if you have a minute and you know it is not a minute.",
+      "When you hear the ice cream truck as an adult with responsibilities.",
+      "Me after learning I can do something online instead of making a phone call.",
+      "When a website remembers your password and you feel seen.",
+      "When a website forgets your password and you question the relationship.",
+      "Me trying to keep plants alive with optimism.",
+      "When the plant survives and now you think you are a farmer.",
+      "When your friend says 'trust me' and the plan has no details.",
+      "Me reading the same paragraph four times and absorbing none of it.",
+      "When the vacation starts and your body immediately requests a nap.",
+      "When your suitcase is overweight and you start wearing layers at the airport.",
+      "Me after finding the perfect GIF for a work chat.",
+      "When the boss says 'great question' and does not answer it.",
+      "When the coffee machine makes a noise nobody has heard before.",
+      "Me trying to make small talk with a haircut appointment.",
+      "When your favorite song starts right as you arrive.",
+      "When you stay in the car to finish the song like it is a sacred duty.",
+      "Me deciding whether a dish is dishwasher safe based on vibes.",
+      "When the instruction manual has pictures but no mercy.",
+      "When you wake up before the alarm and briefly respect yourself.",
+      "When the alarm rings anyway and ruins the alliance.",
+      "Me finding a shortcut and immediately forgetting how I did it.",
+      "When the group chat names a plan and that makes it feel official.",
+      "When you agree to something weeks ago and future you has complaints.",
+      "Me realizing I was the drama, but only privately.",
+      "When your screen freezes on the worst possible facial expression.",
+      "When someone says 'just improvise' to a person with a checklist.",
+      "Me trying to leave a voice note under thirty seconds.",
+      "When your cart total says taxes and fees have entered the story.",
+      "When you successfully guess the USB-C charger from across the room.",
+      "Me after changing one setting and breaking the entire vibe.",
+      "When you find a parking spot close to the entrance.",
+      "When that parking spot is secretly impossible.",
+      "Me convincing myself that buying a storage bin counts as cleaning.",
+      "When the group chat starts with 'hear me out'.",
+      "When the elevator doors close right before awkward small talk begins.",
+      "Me hearing a song from 2012 and becoming a historian.",
+      "When someone compliments your outfit and you explain its full backstory.",
+      "When the browser asks to restore tabs and you see your past life.",
+      "Me trying to remember which streaming service has the thing.",
+      "When the ice in your drink hits at the perfect ratio.",
+      "When you misread the time and unlock a bonus hour.",
+      "When you misread the time and lose the whole plot.",
+      "Me after a haircut, checking every reflective surface.",
+      "When your phone autocorrects a normal word into a confession.",
+      "When the snack you were saving mysteriously saved itself from existence.",
+      "Me trying to look relaxed in a photo.",
+      "When the waiter carries food near your table and keeps walking.",
+      "When you finally throw away the box because the warranty expired in 2019.",
+      "Me making a to-do list with tasks I already completed.",
+      "When your laptop battery goes from 30% to 3% with theatrical timing.",
+      "When someone says 'it should be easy' and the room gets quiet.",
+      "Me hearing 'free food' from two rooms away.",
+      "When you discover a setting that should have been on all along.",
+      "When your past self left a useful note and you forgive them.",
+      "When your past self left a useless note and you reopen the investigation.",
+      "Me trying to stretch but making every joint announce itself.",
+      "When your favorite pen runs out of ink during an important thought.",
+      "When you learn the correct pronunciation after saying it wrong for years.",
+      "Me politely laughing while searching for the exit.",
+      "When the app asks for feedback immediately after failing.",
+      "When you find out the thing you feared was actually fine.",
+      "Me when someone else volunteers before I have to.",
+      "When the train arrives exactly when you do.",
+      "When the train leaves exactly when you do.",
+      "Me pretending to understand a board game explanation.",
+      "When the board game finally makes sense and it is already over.",
+      "When you get a notification and it is just your own reminder.",
+      "Me using fancy words to disguise a guess.",
+      "When a restaurant gives you extra sauce without asking.",
+      "When you realize you have been pushing a pull door.",
+      "Me after saying 'no problem' to a very real problem.",
+      "When the house is quiet and one appliance starts performing.",
+      "When you see a sale and suddenly have needs.",
+      "Me trying to carry every grocery bag in one trip.",
+      "When the grocery bag survives and so does your pride.",
+      "When you remember the thing you forgot, but not where you left it.",
+      "Me receiving a calendar invite titled 'quick sync'.",
+      "When 'quick sync' becomes an archaeological dig.",
+      "When the chair is comfortable enough to change your plans.",
+      "Me choosing a username like I am naming a royal heir.",
+      "When the website says your password is too strong to remember.",
+      "When the room goes silent right as you say the weird part.",
+      "Me trying to decide if a text needs an exclamation mark.",
+      "When you accidentally like a very old post.",
+      "When the snack machine accepts your money and rejects your dreams.",
+      "Me after fixing a typo in someone else's document and feeling powerful.",
+      "When your screen brightness betrays you in public.",
+      "When a package arrives and it is something responsible.",
+      "Me after assembling furniture and having one piece left over.",
+      "When someone says 'let's make it fun' about mandatory training.",
+      "When the automatic door does not open and you become the problem.",
+      "Me trying to keep a straight face during serious nonsense.",
+      "When you remember you made dessert plans.",
+      "When you smell food you did not order.",
+      "Me after one stretch, ready for the wellness podcast.",
+      "When you sit down and the thing you need is just out of reach.",
+      "When someone starts typing, stops, then disappears.",
+      "Me watching someone type for five minutes and send 'ok'.",
+      "When you finally understand the joke from last week.",
+      "When the group photo is good except for you.",
+      "Me taking a screenshot so I can forget about it professionally.",
+      "When your phone says storage full but your memories say no.",
+      "When the elevator mirror shows you the outfit was a choice.",
+      "Me trying to estimate pasta for one person.",
+      "When the pasta estimate becomes a family event.",
+      "When you make tea and forget it until it becomes room temperature tea.",
+      "Me using 'interesting' as a full emotional firewall.",
+      "When someone says 'small world' and the world feels too small.",
+      "When your favorite seat is taken by someone who does not appreciate it.",
+      "Me after finally updating an app I ignored for six months.",
+      "When the update adds a tour you cannot skip.",
+      "When the exact thing you need is in the first drawer.",
+      "When the exact thing you need has entered another dimension.",
+      "Me reading reviews for a product I already bought.",
+      "When the review says exactly what you feared.",
+      "When your outfit has pockets and the day improves.",
+      "Me checking if anyone saw me wave back at someone waving behind me.",
+      "When you open a new tab and forget what you were doing.",
+      "When you close a tab and immediately need it again.",
+      "Me making eye contact with the waiter after saying the wrong table number.",
+      "When you get home and realize social mode is still on.",
+      "When social mode turns off mid-sentence.",
+      "Me trying to describe a song with no lyrics and full confidence.",
+      "When the restaurant is out of the one thing you emotionally selected.",
+      "When the first bite confirms you chose correctly.",
+      "Me looking at the terms 'optional' and 'recommended' like a puzzle.",
+      "When a tutorial says 'now simply' and fear enters the chat.",
+      "When your friend has receipts and the story gets courtroom lighting.",
+      "Me watching a progress bar reverse.",
+      "When you hear your neighbor vacuuming and suddenly feel judged.",
+      "When you find a quiet place and someone opens a loud snack.",
+      "Me after saying 'I'll handle it' with no plan.",
+      "When the solution was in the FAQ the whole time.",
+      "When a device works only after you threaten to replace it.",
+      "Me trying to stay hydrated but becoming a walking water bottle.",
+      "When the text bubble appears and your heart files a report.",
+      "When the text bubble disappears and your heart files an appeal.",
+      "Me rehearsing a food order and still improvising at the counter.",
+      "When the cashier asks 'anything else?' and your brain leaves.",
+      "When your favorite show has a recap and you realize you remember nothing.",
+      "Me after one episode recap, fully invested again.",
+      "When you hear 'technical difficulty' and everyone becomes an expert.",
+      "When the meeting host says 'while we wait'.",
+      "Me on hold, slowly memorizing the entire loop.",
+      "When customer service says your call is important and the music says otherwise.",
+      "When you finally get comfortable and someone asks you to pass something.",
+      "Me realizing I forgot to thaw dinner.",
+      "When dinner becomes cereal with confidence.",
+      "When a typo changes the tone of the whole email.",
+      "Me proofreading after sending, as tradition demands.",
+      "When your favorite app removes the feature you used daily.",
+      "When the old feature returns and everyone pretends they listened.",
+      "Me considering a new hobby after watching one tutorial.",
+      "When the hobby requires equipment and you already have a cart.",
+      "When a free trial asks for a credit card and the trust disappears.",
+      "Me cancelling the free trial with one minute to spare.",
+      "When the automated voice says 'please listen carefully' and lists ten options.",
+      "When none of the ten options are your problem.",
+      "Me after guessing a Wi-Fi password correctly.",
+      "When someone says 'surprise me' while ordering food.",
+      "When your laptop fan starts auditioning for takeoff.",
+      "Me trying to act like I meant to open the wrong door.",
+      "When the first draft is mostly vibes and brackets.",
+      "When the final draft is slightly fewer vibes and fewer brackets."
+    ];
+
+    const loadingState = document.getElementById("loadingState");
+    const errorState = document.getElementById("errorState");
+    const errorMessage = document.getElementById("errorMessage");
+    const retryButton = document.getElementById("retryButton");
+    const gameBoard = document.getElementById("gameBoard");
+    const captionText = document.getElementById("captionText");
+    const statusText = document.getElementById("statusText");
+    const resultText = document.getElementById("resultText");
+    const choices = document.getElementById("choices");
+    const rerollButton = document.getElementById("rerollButton");
+    const nextButton = document.getElementById("nextButton");
+
+    let memeTemplates = [];
+    let currentRound = [];
+    let rerollUsed = false;
+
+    function setView(view) {
+      loadingState.classList.toggle("hidden", view !== "loading");
+      errorState.classList.toggle("hidden", view !== "error");
+      gameBoard.classList.toggle("hidden", view !== "game");
+    }
+
+    function randomItem(items) {
+      return items[Math.floor(Math.random() * items.length)];
+    }
+
+    function templateKey(template) {
+      return template.id || template.url;
+    }
+
+    function pickUniqueTemplates(count, excludedKeys = new Set()) {
+      const pool = memeTemplates.filter((template) => !excludedKeys.has(templateKey(template)));
+      const selected = [];
+
+      while (selected.length < count && pool.length > 0) {
+        const index = Math.floor(Math.random() * pool.length);
+        selected.push(pool.splice(index, 1)[0]);
+      }
+
+      return selected;
+    }
+
+    function renderChoices(excludedKeys) {
+      currentRound = pickUniqueTemplates(3, excludedKeys);
+
+      if (currentRound.length !== 3) {
+        showError("Imgflip did not return enough meme templates to start a round.");
+        return;
+      }
+
+      choices.innerHTML = "";
+
+      currentRound.forEach((template, index) => {
+        const button = document.createElement("button");
+        button.className = "choice";
+        button.type = "button";
+        button.setAttribute("aria-label", `Choose meme template: ${template.name}`);
+
+        const frame = document.createElement("span");
+        frame.className = "image-frame";
+
+        const image = document.createElement("img");
+        image.src = template.url;
+        image.alt = `Meme template: ${template.name}`;
+        image.loading = index === 0 ? "eager" : "lazy";
+
+        const name = document.createElement("span");
+        name.className = "choice-name";
+        name.textContent = `Choice ${index + 1}`;
+
+        frame.appendChild(image);
+        button.append(frame, name);
+        button.addEventListener("click", () => selectTemplate(button, template));
+        choices.appendChild(button);
+      });
+
+      setView("game");
+    }
+
+    function startRound() {
+      rerollUsed = false;
+      captionText.textContent = randomItem(captions);
+      statusText.textContent = "Choose the meme template that makes this caption funniest. You can change your pick before the next round.";
+      resultText.textContent = "";
+      rerollButton.disabled = false;
+      rerollButton.textContent = "New pictures";
+      nextButton.classList.add("hidden");
+      renderChoices();
+    }
+
+    function rerollPictures() {
+      if (rerollUsed) {
+        return;
+      }
+
+      const previousRoundKeys = new Set(currentRound.map(templateKey));
+      rerollUsed = true;
+      resultText.textContent = "";
+      rerollButton.disabled = true;
+      rerollButton.textContent = "Pictures changed";
+      nextButton.classList.add("hidden");
+      statusText.textContent = "New pictures loaded for this caption. This round's picture swap has been used.";
+      renderChoices(previousRoundKeys);
+    }
+
+    function selectTemplate(selectedButton, template) {
+      const choiceButtons = choices.querySelectorAll(".choice");
+
+      choiceButtons.forEach((button) => {
+        button.classList.toggle("selected", button === selectedButton);
+      });
+
+      statusText.textContent = "Selection saved. Pick another image if you want to change it.";
+      resultText.textContent = `You picked: ${template.name}`;
+      nextButton.classList.remove("hidden");
+      nextButton.focus();
+    }
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      setView("error");
+    }
+
+    async function loadMemes() {
+      setView("loading");
+      statusText.textContent = "";
+      resultText.textContent = "";
+
+      try {
+        const response = await fetch(API_URL);
+
+        if (!response.ok) {
+          throw new Error(`Imgflip returned HTTP ${response.status}.`);
+        }
+
+        const payload = await response.json();
+        const templates = payload && payload.data && Array.isArray(payload.data.memes)
+          ? payload.data.memes
+          : [];
+
+        const seenTemplates = new Set();
+        memeTemplates = templates.filter((template) => {
+          if (!template || !template.name || !template.url) {
+            return false;
+          }
+
+          const key = template.id || template.url;
+          if (seenTemplates.has(key)) {
+            return false;
+          }
+
+          seenTemplates.add(key);
+          return true;
+        });
+
+        if (!payload.success || memeTemplates.length < 3) {
+          throw new Error("Imgflip returned an unusable meme list.");
+        }
+
+        startRound();
+      } catch (error) {
+        showError(error.message || "Could not load meme templates.");
+      }
+    }
+
+    retryButton.addEventListener("click", loadMemes);
+    rerollButton.addEventListener("click", rerollPictures);
+    nextButton.addEventListener("click", startRound);
+
+    loadMemes();
+  </script>
+</body>
+</html>
