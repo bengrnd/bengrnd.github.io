@@ -53,7 +53,7 @@
     }
 
     .page {
-      width: min(1120px, calc(100% - 32px));
+      width: calc(100% - 32px);
       margin: 0 auto;
       padding: 32px 0 56px;
     }
@@ -129,6 +129,11 @@
       overflow-wrap: break-word;
     }
 
+    .meme-title:hover,
+    .meme-title:focus-visible {
+      color: var(--accent-dark);
+    }
+
     .status {
       min-height: 1.6em;
       margin: 0;
@@ -192,12 +197,20 @@
 
     .meme-frame {
       width: min(100%, 760px);
-      max-height: 58vh;
       margin: 0 auto;
       border: 0;
       background: #ffffff;
       cursor: zoom-in;
       padding: 0;
+      aspect-ratio: auto;
+      overflow: visible;
+    }
+
+    .meme-frame img {
+      width: 100%;
+      height: auto;
+      max-height: 58vh;
+      object-fit: contain;
     }
 
     .meme-frame:hover {
@@ -211,6 +224,34 @@
       font-weight: 800;
       line-height: 1.35;
       overflow-wrap: break-word;
+      white-space: pre-line;
+    }
+
+    .choice.two-caption-card {
+      border-color: rgba(15, 118, 110, 0.32);
+    }
+
+    .two-caption-text {
+      display: grid;
+      gap: 14px;
+    }
+
+    .caption-part {
+      display: grid;
+      gap: 4px;
+    }
+
+    .caption-part + .caption-part {
+      padding-top: 14px;
+      border-top: 1px dashed rgba(15, 118, 110, 0.45);
+    }
+
+    .caption-part-label {
+      color: var(--accent-dark);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     .actions {
@@ -331,6 +372,8 @@
 
     .image-modal-stage img {
       display: block;
+      width: auto;
+      height: auto;
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
@@ -340,7 +383,7 @@
 
     @media (max-width: 760px) {
       .page {
-        width: min(100% - 24px, 1120px);
+        width: calc(100% - 24px);
         padding-top: 22px;
       }
 
@@ -384,14 +427,6 @@
 <body>
   <main class="page">
     <div class="shell">
-      <header class="hero">
-        <p class="eyebrow">Pick the funniest fit</p>
-        <h1>Meme Match</h1>
-        <p class="intro">
-          Match one raw meme template with the funniest card in your caption hand. No overlays, just instinct.
-        </p>
-      </header>
-
       <section class="game" aria-label="Meme Match game">
         <div id="loadingState" class="message" aria-live="polite">Loading meme templates...</div>
 
@@ -406,7 +441,7 @@
             <button id="memeZoomButton" class="image-frame meme-frame" type="button" aria-label="View meme template larger">
               <img id="memeImage" src="" alt="" />
             </button>
-            <p id="memeName" class="meme-title"></p>
+            <a id="memeName" class="meme-title" href="https://knowyourmeme.com/" target="_blank" rel="noopener noreferrer"></a>
           </div>
 
           <p id="statusText" class="status" aria-live="polite"></p>
@@ -417,6 +452,7 @@
             <p id="resultText" class="status" aria-live="polite"></p>
             <div class="action-buttons">
               <button id="rerollButton" class="secondary-button" type="button">New picture</button>
+              <button id="refreshCardsButton" class="secondary-button" type="button">Refresh cards</button>
               <button id="nextButton" class="primary-button hidden" type="button">Next round</button>
             </div>
           </div>
@@ -751,7 +787,47 @@
       "When your laptop fan starts auditioning for takeoff.",
       "Me trying to act like I meant to open the wrong door.",
       "When the first draft is mostly vibes and brackets.",
-      "When the final draft is slightly fewer vibes and fewer brackets."
+      "When the final draft is slightly fewer vibes and fewer brackets.",
+      "Me: I will go to bed early tonight.\nMe at 1:47 a.m.: One more video.",
+      "My to-do list: Please be realistic.\nMe: Adds six new tasks.",
+      "Me before checking my bank account: I am financially responsible.\nMy bank account: Let us review the evidence.",
+      "When the recipe says 20 minutes total.\nAnd you are still looking for the measuring cups.",
+      "Me: I need to save money.\nAlso me: This tiny treat has earned it.",
+      "My brain at 9 a.m.: We can do anything.\nMy brain at 2 p.m.: We have done enough.",
+      "When you hear your name in another room.\nAnd it is followed by 'can you help?'.",
+      "Me: I will only check one notification.\nMy phone: Welcome back. You have been gone for hours.",
+      "When the Wi-Fi goes out.\nAnd suddenly everyone remembers each other exists.",
+      "Me explaining the plan: It is actually very simple.\nThe plan: Has seven tabs and a spreadsheet.",
+      "When you finally get comfortable.\nAnd remember the charger is across the room.",
+      "Me: I am not hungry.\nThe smell of someone else's food: Are you sure?",
+      "When the group project starts.\nAnd one person immediately becomes management.",
+      "Me after one good email: Career saved.\nMe after one confusing email: Career over.",
+      "When autocorrect changes one word.\nAnd the text now requires a formal apology.",
+      "My alarm: Good morning.\nMe: This sounds like a problem for tomorrow.",
+      "When the package says 'out for delivery'.\nMe: Cancels all plans and watches the window.",
+      "Me: I will remember that.\nAlso me, five seconds later: Remember what?",
+      "When someone says 'quick question'.\nAnd opens a story with three seasons.",
+      "My laptop at 30%: We are fine.\nMy laptop at 3%: This is goodbye.",
+      "When you accidentally open the front camera.\nAnd meet the version of yourself with no warning.",
+      "Me: I will start after a short break.\nThe short break: Becomes a documentary series.",
+      "When the meeting could have been an email.\nBut now there is a slide deck.",
+      "Me trying to be spontaneous.\nMy calendar: Absolutely not.",
+      "When the printer finally works.\nAnd nobody wants to ask why.",
+      "Me after buying a planner: New life unlocked.\nThe planner two weeks later: Still in its packaging.",
+      "When you make eye contact after tripping.\nAnd both of you agree to forget it happened.",
+      "Me: I will cook something simple.\nThe kitchen: Looks like a competitive cooking show.",
+      "When you find money in an old jacket.\nAnd briefly feel ready to retire.",
+      "My brain during the meeting: Stay focused.\nMy brain: What was the first person to eat an olive thinking?",
+      "When you close all the tabs.\nAnd immediately need the one you just closed.",
+      "Me: I am just resting my eyes.\nThe clock: Three hours have passed.",
+      "When the instructions say 'some assembly required'.\nAnd the screws have no names.",
+      "Me reading an old message: Why did I write that?\nPast me: It felt right at the time.",
+      "When the food arrives at the table next to yours.\nAnd your order suddenly becomes a personal betrayal.",
+      "Me: I can carry all the grocery bags at once.\nMy fingers: This is a workplace safety violation.",
+      "When the playlist plays the perfect song.\nAnd you suddenly forgive the whole algorithm.",
+      "Me after one productive task: Momentum.\nMe after the second task: Recovery period.",
+      "When a free trial asks for a credit card.\nAnd the trust exercise ends immediately.",
+      "Me trying to sound professional.\nMy chair: Slowly lowers me out of frame."
     ];
 
     const loadingState = document.getElementById("loadingState");
@@ -771,6 +847,7 @@
     const resultText = document.getElementById("resultText");
     const choices = document.getElementById("choices");
     const rerollButton = document.getElementById("rerollButton");
+    const refreshCardsButton = document.getElementById("refreshCardsButton");
     const nextButton = document.getElementById("nextButton");
 
     const HAND_SIZE = 5;
@@ -781,6 +858,7 @@
     let captionHand = [];
     let discardPile = [];
     let rerollUsed = false;
+    let cardsRefreshUsed = false;
     let pendingPlayedCaption = null;
 
     function setView(view) {
@@ -846,6 +924,8 @@
       memeImage.src = template.url;
       memeImage.alt = `Meme template: ${template.name}`;
       memeName.textContent = template.name;
+      memeName.href = `https://knowyourmeme.com/search?q=${encodeURIComponent(template.name)}`;
+      memeName.setAttribute("aria-label", `Search Know Your Meme for ${template.name}`);
       imageModalImage.src = template.url;
       imageModalImage.alt = `Meme template: ${template.name}`;
       imageModalTitle.textContent = template.name;
@@ -879,11 +959,33 @@
 
         const label = document.createElement("span");
         label.className = "caption-label";
-        label.textContent = `Card ${index + 1}`;
+        const captionCount = caption.includes("\n") ? 2 : 1;
+        const captionParts = caption.split(String.fromCharCode(10));
+        button.classList.toggle("two-caption-card", captionCount === 2);
+        label.textContent = `Card ${index + 1} · ${captionCount} caption${captionCount === 1 ? "" : "s"}`;
 
         const text = document.createElement("span");
         text.className = "caption-text";
-        text.textContent = caption;
+
+        if (captionCount === 2) {
+          text.classList.add("two-caption-text");
+
+          captionParts.forEach((captionPart, partIndex) => {
+            const part = document.createElement("span");
+            part.className = "caption-part";
+
+            const partLabel = document.createElement("span");
+            partLabel.className = "caption-part-label";
+            partLabel.textContent = partIndex === 0 ? "Top blank" : "Bottom blank";
+
+            const partText = document.createElement("span");
+            partText.textContent = captionPart;
+            part.append(partLabel, partText);
+            text.appendChild(part);
+          });
+        } else {
+          text.textContent = caption;
+        }
 
         button.append(label, text);
         button.addEventListener("click", () => selectCaption(button, caption));
@@ -893,6 +995,7 @@
 
     function prepareRound(template = pickTemplate(currentTemplate)) {
       rerollUsed = false;
+      cardsRefreshUsed = false;
       pendingPlayedCaption = null;
       renderTemplate(template);
       renderHand();
@@ -901,6 +1004,8 @@
       resultText.textContent = "";
       rerollButton.disabled = false;
       rerollButton.textContent = "New picture";
+      refreshCardsButton.disabled = false;
+      refreshCardsButton.textContent = "Refresh cards";
       nextButton.classList.add("hidden");
       setView("game");
     }
@@ -947,6 +1052,34 @@
       renderTemplate(pickTemplate(currentTemplate));
       renderHand();
       statusText.textContent = "New picture loaded for this hand. This round's picture swap has been used.";
+    }
+
+    function refreshCards() {
+      if (cardsRefreshUsed) {
+        return;
+      }
+
+      cardsRefreshUsed = true;
+      discardPile.push(...captionHand);
+      captionHand = [];
+      pendingPlayedCaption = null;
+
+      while (captionHand.length < HAND_SIZE) {
+        const replacement = drawCaption();
+
+        if (!replacement) {
+          break;
+        }
+
+        captionHand.push(replacement);
+      }
+
+      resultText.textContent = "";
+      refreshCardsButton.disabled = true;
+      refreshCardsButton.textContent = "Cards refreshed";
+      nextButton.classList.add("hidden");
+      renderHand();
+      statusText.textContent = "New caption cards loaded. This round's card refresh has been used.";
     }
 
     function selectCaption(selectedButton, caption) {
@@ -1025,6 +1158,7 @@
       }
     });
     rerollButton.addEventListener("click", rerollPicture);
+    refreshCardsButton.addEventListener("click", refreshCards);
     nextButton.addEventListener("click", startRound);
 
     loadMemes();
