@@ -48,6 +48,10 @@
       outline-offset: 4px;
     }
 
+    body.modal-open {
+      overflow: hidden;
+    }
+
     .page {
       width: min(1120px, calc(100% - 32px));
       margin: 0 auto;
@@ -98,7 +102,7 @@
       box-shadow: var(--shadow);
     }
 
-    .caption-card {
+    .meme-card {
       display: grid;
       gap: 8px;
       padding: clamp(18px, 3vw, 26px);
@@ -107,6 +111,7 @@
       background: var(--surface-soft);
     }
 
+    .meme-label,
     .caption-label {
       margin: 0;
       color: var(--accent-dark);
@@ -116,12 +121,11 @@
       text-transform: uppercase;
     }
 
-    .caption {
-      min-height: 2.8em;
+    .meme-title {
       margin: 0;
-      font-size: clamp(24px, 4vw, 42px);
+      color: var(--muted);
+      font-size: 16px;
       font-weight: 800;
-      line-height: 1.16;
       overflow-wrap: break-word;
     }
 
@@ -134,7 +138,7 @@
 
     .choices {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 16px;
     }
 
@@ -186,12 +190,27 @@
       object-fit: contain;
     }
 
-    .choice-name {
-      min-height: 2.7em;
-      color: var(--muted);
-      font-size: 14px;
+    .meme-frame {
+      width: min(100%, 760px);
+      max-height: 58vh;
+      margin: 0 auto;
+      border: 0;
+      background: #ffffff;
+      cursor: zoom-in;
+      padding: 0;
+    }
+
+    .meme-frame:hover {
+      box-shadow: 0 18px 36px rgba(22, 24, 29, 0.14);
+    }
+
+    .caption-text {
+      min-height: 8.4em;
+      color: var(--text);
+      font-size: clamp(16px, 1.8vw, 19px);
       font-weight: 800;
       line-height: 1.35;
+      overflow-wrap: break-word;
     }
 
     .actions {
@@ -256,6 +275,69 @@
       color: var(--danger);
     }
 
+    .image-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 16px;
+      padding: clamp(14px, 3vw, 28px);
+      background: rgba(22, 24, 29, 0.86);
+    }
+
+    .image-modal.hidden {
+      display: none;
+    }
+
+    .image-modal-header {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      color: #ffffff;
+    }
+
+    .image-modal-title {
+      margin: 0;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .image-modal-close {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.46);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .image-modal-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .image-modal-stage {
+      display: grid;
+      min-height: 0;
+      place-items: center;
+    }
+
+    .image-modal-stage img {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 6px;
+      background: #ffffff;
+    }
+
     @media (max-width: 760px) {
       .page {
         width: min(100% - 24px, 1120px);
@@ -270,7 +352,7 @@
         padding: 10px;
       }
 
-      .choice-name {
+      .caption-text {
         min-height: auto;
       }
 
@@ -306,7 +388,7 @@
         <p class="eyebrow">Pick the funniest fit</p>
         <h1>Meme Match</h1>
         <p class="intro">
-          Match a caption with one of three raw meme templates. No generated captions, no overlays, just instinct.
+          Match one raw meme template with the funniest card in your caption hand. No overlays, just instinct.
         </p>
       </header>
 
@@ -319,19 +401,22 @@
         </div>
 
         <div id="gameBoard" class="hidden">
-          <div class="caption-card">
-            <p class="caption-label">Caption card</p>
-            <p id="captionText" class="caption"></p>
+          <div class="meme-card">
+            <p class="meme-label">Meme template</p>
+            <button id="memeZoomButton" class="image-frame meme-frame" type="button" aria-label="View meme template larger">
+              <img id="memeImage" src="" alt="" />
+            </button>
+            <p id="memeName" class="meme-title"></p>
           </div>
 
           <p id="statusText" class="status" aria-live="polite"></p>
 
-          <div id="choices" class="choices" aria-label="Meme template choices"></div>
+          <div id="choices" class="choices" aria-label="Caption card choices"></div>
 
           <div class="actions">
             <p id="resultText" class="status" aria-live="polite"></p>
             <div class="action-buttons">
-              <button id="rerollButton" class="secondary-button" type="button">New pictures</button>
+              <button id="rerollButton" class="secondary-button" type="button">New picture</button>
               <button id="nextButton" class="primary-button hidden" type="button">Next round</button>
             </div>
           </div>
@@ -339,6 +424,16 @@
       </section>
     </div>
   </main>
+
+  <div id="imageModal" class="image-modal hidden" role="dialog" aria-modal="true" aria-labelledby="imageModalTitle">
+    <div class="image-modal-header">
+      <p id="imageModalTitle" class="image-modal-title"></p>
+      <button id="imageModalClose" class="image-modal-close" type="button" aria-label="Close enlarged meme image">&times;</button>
+    </div>
+    <div id="imageModalStage" class="image-modal-stage">
+      <img id="imageModalImage" src="" alt="" />
+    </div>
+  </div>
 
   <script>
     const API_URL = "https://api.imgflip.com/get_memes";
@@ -664,16 +759,29 @@
     const errorMessage = document.getElementById("errorMessage");
     const retryButton = document.getElementById("retryButton");
     const gameBoard = document.getElementById("gameBoard");
-    const captionText = document.getElementById("captionText");
+    const memeZoomButton = document.getElementById("memeZoomButton");
+    const memeImage = document.getElementById("memeImage");
+    const memeName = document.getElementById("memeName");
+    const imageModal = document.getElementById("imageModal");
+    const imageModalTitle = document.getElementById("imageModalTitle");
+    const imageModalClose = document.getElementById("imageModalClose");
+    const imageModalStage = document.getElementById("imageModalStage");
+    const imageModalImage = document.getElementById("imageModalImage");
     const statusText = document.getElementById("statusText");
     const resultText = document.getElementById("resultText");
     const choices = document.getElementById("choices");
     const rerollButton = document.getElementById("rerollButton");
     const nextButton = document.getElementById("nextButton");
 
+    const HAND_SIZE = 5;
+
     let memeTemplates = [];
-    let currentRound = [];
+    let currentTemplate = null;
+    let captionDeck = [];
+    let captionHand = [];
+    let discardPile = [];
     let rerollUsed = false;
+    let pendingPlayedCaption = null;
 
     function setView(view) {
       loadingState.classList.toggle("hidden", view !== "loading");
@@ -689,90 +797,168 @@
       return template.id || template.url;
     }
 
-    function pickUniqueTemplates(count, excludedKeys = new Set()) {
-      const pool = memeTemplates.filter((template) => !excludedKeys.has(templateKey(template)));
-      const selected = [];
+    function shuffled(items) {
+      const shuffledItems = [...items];
 
-      while (selected.length < count && pool.length > 0) {
-        const index = Math.floor(Math.random() * pool.length);
-        selected.push(pool.splice(index, 1)[0]);
+      for (let index = shuffledItems.length - 1; index > 0; index -= 1) {
+        const swapIndex = Math.floor(Math.random() * (index + 1));
+        [shuffledItems[index], shuffledItems[swapIndex]] = [shuffledItems[swapIndex], shuffledItems[index]];
       }
 
-      return selected;
+      return shuffledItems;
     }
 
-    function renderChoices(excludedKeys) {
-      currentRound = pickUniqueTemplates(3, excludedKeys);
+    function setupCaptionDeck() {
+      captionDeck = shuffled(captions);
+      captionHand = [];
+      discardPile = [];
+      pendingPlayedCaption = null;
 
-      if (currentRound.length !== 3) {
-        showError("Imgflip did not return enough meme templates to start a round.");
+      while (captionHand.length < HAND_SIZE) {
+        const caption = drawCaption();
+
+        if (!caption) {
+          break;
+        }
+
+        captionHand.push(caption);
+      }
+    }
+
+    function drawCaption() {
+      if (captionDeck.length === 0 && discardPile.length > 0) {
+        const cardsInHand = new Set(captionHand);
+        captionDeck = shuffled(discardPile.filter((caption) => !cardsInHand.has(caption)));
+        discardPile = discardPile.filter((caption) => cardsInHand.has(caption));
+      }
+
+      return captionDeck.shift() || null;
+    }
+
+    function pickTemplate(excludedTemplate = null) {
+      const excludedKey = excludedTemplate ? templateKey(excludedTemplate) : null;
+      const pool = memeTemplates.filter((template) => templateKey(template) !== excludedKey);
+      return randomItem(pool.length > 0 ? pool : memeTemplates);
+    }
+
+    function renderTemplate(template) {
+      currentTemplate = template;
+      memeImage.src = template.url;
+      memeImage.alt = `Meme template: ${template.name}`;
+      memeName.textContent = template.name;
+      imageModalImage.src = template.url;
+      imageModalImage.alt = `Meme template: ${template.name}`;
+      imageModalTitle.textContent = template.name;
+      memeZoomButton.setAttribute("aria-label", `View meme template larger: ${template.name}`);
+    }
+
+    function openImageModal() {
+      if (!currentTemplate) {
         return;
       }
 
+      imageModal.classList.remove("hidden");
+      document.body.classList.add("modal-open");
+      imageModalClose.focus();
+    }
+
+    function closeImageModal() {
+      imageModal.classList.add("hidden");
+      document.body.classList.remove("modal-open");
+      memeZoomButton.focus();
+    }
+
+    function renderHand() {
       choices.innerHTML = "";
 
-      currentRound.forEach((template, index) => {
+      captionHand.forEach((caption, index) => {
         const button = document.createElement("button");
         button.className = "choice";
         button.type = "button";
-        button.setAttribute("aria-label", `Choose meme template: ${template.name}`);
+        button.setAttribute("aria-label", `Play caption card ${index + 1}: ${caption}`);
 
-        const frame = document.createElement("span");
-        frame.className = "image-frame";
+        const label = document.createElement("span");
+        label.className = "caption-label";
+        label.textContent = `Card ${index + 1}`;
 
-        const image = document.createElement("img");
-        image.src = template.url;
-        image.alt = `Meme template: ${template.name}`;
-        image.loading = index === 0 ? "eager" : "lazy";
+        const text = document.createElement("span");
+        text.className = "caption-text";
+        text.textContent = caption;
 
-        const name = document.createElement("span");
-        name.className = "choice-name";
-        name.textContent = `Choice ${index + 1}`;
-
-        frame.appendChild(image);
-        button.append(frame, name);
-        button.addEventListener("click", () => selectTemplate(button, template));
+        button.append(label, text);
+        button.addEventListener("click", () => selectCaption(button, caption));
         choices.appendChild(button);
       });
+    }
 
+    function prepareRound(template = pickTemplate(currentTemplate)) {
+      rerollUsed = false;
+      pendingPlayedCaption = null;
+      renderTemplate(template);
+      renderHand();
+
+      statusText.textContent = "Choose the caption card that makes this meme funniest. You can change your pick before the next round.";
+      resultText.textContent = "";
+      rerollButton.disabled = false;
+      rerollButton.textContent = "New picture";
+      nextButton.classList.add("hidden");
       setView("game");
     }
 
     function startRound() {
-      rerollUsed = false;
-      captionText.textContent = randomItem(captions);
-      statusText.textContent = "Choose the meme template that makes this caption funniest. You can change your pick before the next round.";
-      resultText.textContent = "";
-      rerollButton.disabled = false;
-      rerollButton.textContent = "New pictures";
-      nextButton.classList.add("hidden");
-      renderChoices();
+      if (pendingPlayedCaption) {
+        const playedIndex = captionHand.indexOf(pendingPlayedCaption);
+
+        if (playedIndex !== -1) {
+          captionHand.splice(playedIndex, 1);
+          discardPile.push(pendingPlayedCaption);
+
+          const replacement = drawCaption();
+          if (replacement) {
+            captionHand.splice(playedIndex, 0, replacement);
+          }
+        }
+      }
+
+      while (captionHand.length < HAND_SIZE) {
+        const replacement = drawCaption();
+
+        if (!replacement) {
+          break;
+        }
+
+        captionHand.push(replacement);
+      }
+
+      prepareRound();
     }
 
-    function rerollPictures() {
+    function rerollPicture() {
       if (rerollUsed) {
         return;
       }
 
-      const previousRoundKeys = new Set(currentRound.map(templateKey));
       rerollUsed = true;
       resultText.textContent = "";
       rerollButton.disabled = true;
-      rerollButton.textContent = "Pictures changed";
+      rerollButton.textContent = "Picture changed";
       nextButton.classList.add("hidden");
-      statusText.textContent = "New pictures loaded for this caption. This round's picture swap has been used.";
-      renderChoices(previousRoundKeys);
+      pendingPlayedCaption = null;
+      renderTemplate(pickTemplate(currentTemplate));
+      renderHand();
+      statusText.textContent = "New picture loaded for this hand. This round's picture swap has been used.";
     }
 
-    function selectTemplate(selectedButton, template) {
+    function selectCaption(selectedButton, caption) {
       const choiceButtons = choices.querySelectorAll(".choice");
 
       choiceButtons.forEach((button) => {
         button.classList.toggle("selected", button === selectedButton);
       });
 
-      statusText.textContent = "Selection saved. Pick another image if you want to change it.";
-      resultText.textContent = `You picked: ${template.name}`;
+      pendingPlayedCaption = caption;
+      statusText.textContent = "Caption saved. Pick another card if you want to change it.";
+      resultText.textContent = `You played: ${caption}`;
       nextButton.classList.remove("hidden");
       nextButton.focus();
     }
@@ -814,10 +1000,11 @@
           return true;
         });
 
-        if (!payload.success || memeTemplates.length < 3) {
+        if (!payload.success || memeTemplates.length < 1) {
           throw new Error("Imgflip returned an unusable meme list.");
         }
 
+        setupCaptionDeck();
         startRound();
       } catch (error) {
         showError(error.message || "Could not load meme templates.");
@@ -825,7 +1012,19 @@
     }
 
     retryButton.addEventListener("click", loadMemes);
-    rerollButton.addEventListener("click", rerollPictures);
+    memeZoomButton.addEventListener("click", openImageModal);
+    imageModalClose.addEventListener("click", closeImageModal);
+    imageModal.addEventListener("click", (event) => {
+      if (event.target === imageModal || event.target === imageModalStage) {
+        closeImageModal();
+      }
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !imageModal.classList.contains("hidden")) {
+        closeImageModal();
+      }
+    });
+    rerollButton.addEventListener("click", rerollPicture);
     nextButton.addEventListener("click", startRound);
 
     loadMemes();
