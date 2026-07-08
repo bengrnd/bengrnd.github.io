@@ -526,6 +526,10 @@ section {
     font-size: 12px;
   }
 
+  .nav-optional-mobile {
+    display: none;
+  }
+
   .hero {
     gap: 26px;
     padding: 24px 16px;
