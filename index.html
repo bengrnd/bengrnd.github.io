@@ -5,555 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Benjamin Grandmontagne</title>
-
-  <style>
-    :root {
-      color-scheme: light;
-      --bg: #f7f4ef;
-      --surface: rgba(255, 255, 255, 0.84);
-      --surface-solid: #fffaf3;
-      --surface-strong: #ffffff;
-      --text: #17191d;
-      --muted: #5f6670;
-      --subtle: #7d7366;
-      --line: rgba(34, 36, 40, 0.13);
-      --line-strong: rgba(34, 36, 40, 0.22);
-      --accent: #155e63;
-      --accent-strong: #0e4a50;
-      --accent-soft: #dfeeed;
-      --gold: #a46d2a;
-      --shadow: 0 24px 70px rgba(42, 35, 28, 0.12);
-      --shadow-soft: 0 14px 34px rgba(42, 35, 28, 0.08);
-      --radius: 8px;
-      --page-pad: clamp(18px, 4vw, 48px);
-      --section-gap: clamp(64px, 8vw, 112px);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      min-width: 320px;
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      line-height: 1.65;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 14% 8%, rgba(21, 94, 99, 0.15), transparent 31rem),
-        radial-gradient(circle at 86% 4%, rgba(164, 109, 42, 0.14), transparent 28rem),
-        linear-gradient(135deg, #fffaf3 0%, var(--bg) 46%, #eef4f2 100%);
-    }
-
-    body::before {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      content: "";
-      background-image:
-        linear-gradient(rgba(23, 25, 29, 0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(23, 25, 29, 0.04) 1px, transparent 1px);
-      background-size: 88px 88px;
-      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent 72%);
-    }
-
-    a {
-      color: var(--accent);
-      text-underline-offset: 4px;
-      transition: color 160ms ease, border-color 160ms ease, background 160ms ease, transform 160ms ease;
-    }
-
-    a:hover {
-      color: var(--accent-strong);
-    }
-
-    a:focus-visible {
-      outline: 3px solid rgba(21, 94, 99, 0.28);
-      outline-offset: 4px;
-      border-radius: 4px;
-    }
-
-    p {
-      margin: 0 0 16px;
-    }
-
-    h1,
-    h2,
-    h3 {
-      margin: 0;
-      line-height: 1.08;
-      letter-spacing: 0;
-    }
-
-    h1 {
-      max-width: 940px;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(48px, 7.4vw, 96px);
-      font-weight: 700;
-      overflow-wrap: normal;
-    }
-
-    h2 {
-      max-width: 760px;
-      margin-bottom: 22px;
-      font-size: clamp(28px, 4vw, 48px);
-      font-weight: 700;
-      overflow-wrap: break-word;
-    }
-
-    h3 {
-      margin-bottom: 10px;
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    .page {
-      width: min(1180px, calc(100% - (var(--page-pad) * 2)));
-      margin: 0 auto;
-      padding: 22px 0 64px;
-    }
-
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: clamp(64px, 8vw, 108px);
-      padding: 10px 12px 10px 18px;
-      border: 1px solid rgba(255, 255, 255, 0.74);
-      border-radius: var(--radius);
-      background: rgba(255, 250, 243, 0.78);
-      box-shadow: 0 12px 30px rgba(42, 35, 28, 0.08);
-      backdrop-filter: blur(18px);
-    }
-
-    .nav-mark {
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-decoration: none;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .nav-links {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 6px;
-    }
-
-    .nav-links a {
-      display: inline-flex;
-      min-height: 36px;
-      align-items: center;
-      padding: 7px 11px;
-      border-radius: 6px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .nav-links a:hover,
-    .nav-links a:focus-visible {
-      color: var(--text);
-      background: rgba(21, 94, 99, 0.09);
-    }
-
-    main {
-      display: grid;
-      gap: var(--section-gap);
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
-      gap: clamp(32px, 4vw, 56px);
-      align-items: end;
-      min-height: min(680px, calc(100vh - 128px));
-      padding: clamp(32px, 6vw, 72px);
-      border: 1px solid rgba(255, 255, 255, 0.76);
-      border-radius: var(--radius);
-      background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 250, 243, 0.72)),
-        linear-gradient(120deg, rgba(21, 94, 99, 0.09), transparent 58%);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero-kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 22px;
-      color: var(--accent-strong);
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .hero-kicker::before {
-      width: 42px;
-      height: 1px;
-      content: "";
-      background: var(--gold);
-    }
-
-    .subtitle {
-      max-width: 850px;
-      margin: 24px 0 22px;
-      color: #252a31;
-      font-size: clamp(22px, 3vw, 34px);
-      line-height: 1.3;
-    }
-
-    .intro {
-      max-width: 780px;
-      color: #454c55;
-      font-size: clamp(17px, 1.7vw, 19px);
-      line-height: 1.68;
-    }
-
-    .hero-panel {
-      display: grid;
-      gap: 14px;
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.72);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .signal {
-      padding: 16px 0 0;
-      border-top: 1px solid var(--line);
-    }
-
-    .signal:first-child {
-      padding-top: 0;
-      border-top: 0;
-    }
-
-    .signal strong {
-      display: block;
-      margin-bottom: 4px;
-      color: var(--text);
-      font-size: 15px;
-    }
-
-    .signal span {
-      display: block;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    section {
-      scroll-margin-top: 96px;
-    }
-
-    .section-shell {
-      display: grid;
-      gap: 28px;
-    }
-
-    .section-head {
-      max-width: 790px;
-    }
-
-    .section-kicker {
-      margin-bottom: 12px;
-      color: var(--accent);
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .two-column {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(300px, 0.88fr);
-      gap: clamp(32px, 6vw, 72px);
-      align-items: start;
-    }
-
-    .lead {
-      max-width: 700px;
-      color: #333942;
-      font-size: clamp(18px, 2vw, 21px);
-      line-height: 1.62;
-    }
-
-    .focus-list {
-      display: grid;
-      gap: 0;
-      margin: 0;
-      padding: 0;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.62);
-      box-shadow: var(--shadow-soft);
-      list-style: none;
-      overflow: hidden;
-    }
-
-    .focus-list li {
-      padding: 22px;
-      border-top: 1px solid var(--line);
-    }
-
-    .focus-list li:first-child {
-      border-top: 0;
-    }
-
-    .focus-list strong {
-      display: block;
-      margin-bottom: 6px;
-      color: var(--text);
-      font-size: 16px;
-    }
-
-    .focus-list span {
-      display: block;
-      color: var(--muted);
-      line-height: 1.56;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    .card {
-      display: flex;
-      min-height: 100%;
-      flex-direction: column;
-      padding: clamp(22px, 3vw, 30px);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.74);
-      box-shadow: 0 12px 26px rgba(42, 35, 28, 0.07);
-      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
-    }
-
-    .card:hover {
-      border-color: rgba(21, 94, 99, 0.28);
-      background: rgba(255, 255, 255, 0.92);
-      box-shadow: 0 18px 42px rgba(42, 35, 28, 0.12);
-      transform: translateY(-3px);
-    }
-
-    .card.featured {
-      background:
-        linear-gradient(135deg, rgba(21, 94, 99, 0.11), rgba(255, 255, 255, 0.84)),
-        var(--surface-solid);
-    }
-
-    .card p:last-child {
-      margin-bottom: 0;
-    }
-
-    .tag {
-      display: inline-flex;
-      width: fit-content;
-      align-items: center;
-      margin-bottom: 16px;
-      padding: 5px 9px;
-      border: 1px solid rgba(21, 94, 99, 0.18);
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent-strong);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    .small {
-      margin-top: auto;
-      padding-top: 12px;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .small a {
-      font-weight: 700;
-    }
-
-    .contact {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 24px;
-      align-items: center;
-      padding: clamp(28px, 5vw, 44px);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: rgba(21, 94, 99, 0.08);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .contact h2 {
-      margin-bottom: 0;
-    }
-
-    .contact p:last-child {
-      margin-bottom: 0;
-      color: var(--muted);
-      font-size: 17px;
-    }
-
-    @media (max-width: 1080px) {
-      .hero {
-        grid-template-columns: 1fr;
-        min-height: auto;
-      }
-
-      .hero-panel {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .signal {
-        padding: 0 0 0 14px;
-        border-top: 0;
-        border-left: 1px solid var(--line);
-      }
-
-      .signal:first-child {
-        padding-left: 0;
-        border-left: 0;
-      }
-    }
-
-    @media (max-width: 900px) {
-      nav {
-        position: static;
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .nav-links {
-        justify-content: flex-start;
-      }
-
-      .two-column,
-      .contact {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 680px) {
-      :root {
-        --page-pad: 16px;
-        --section-gap: 54px;
-      }
-
-      .page {
-        padding-top: 14px;
-        padding-bottom: 42px;
-      }
-
-      nav {
-        margin-bottom: 32px;
-        padding: 12px;
-      }
-
-      .nav-mark {
-        font-size: 12px;
-      }
-
-      .nav-links {
-        width: 100%;
-        gap: 5px;
-      }
-
-      .nav-links a {
-        min-height: 34px;
-        padding: 6px 9px;
-        font-size: 13px;
-      }
-
-      .hero {
-        gap: 28px;
-        padding: 26px 20px;
-      }
-
-      h1 {
-        font-size: clamp(38px, 10.5vw, 46px);
-        overflow-wrap: break-word;
-      }
-
-      h2 {
-        font-size: clamp(26px, 8vw, 34px);
-      }
-
-      h3 {
-        font-size: 19px;
-      }
-
-      .subtitle {
-        margin-top: 18px;
-        font-size: clamp(21px, 6vw, 28px);
-      }
-
-      .intro,
-      .lead {
-        font-size: 17px;
-      }
-
-      .hero-panel,
-      .cards {
-        grid-template-columns: 1fr;
-      }
-
-      .signal {
-        padding: 14px 0 0;
-        border-top: 1px solid var(--line);
-        border-left: 0;
-      }
-
-      .signal:first-child {
-        padding-top: 0;
-        border-top: 0;
-      }
-
-      .focus-list li {
-        padding: 19px;
-      }
-
-      .contact {
-        padding: 24px 20px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-      }
-    }
-  </style>
+  <meta name="description" content="Benjamin Grandmontagne — finance professional focused on AI, transformation, regulation, and practical decision systems." />
+  <link rel="canonical" href="https://bengrnd.github.io/" />
+  <meta property="og:title" content="Benjamin Grandmontagne" />
+  <meta property="og:description" content="Finance, AI, transformation, regulation, and practical decision systems." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://bengrnd.github.io/" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Benjamin Grandmontagne" />
+  <meta name="twitter:description" content="Finance, AI, transformation, regulation, and practical decision systems." />
+  <meta name="theme-color" content="#155e63" />
+
+  <link rel="stylesheet" href="assets/css/main.css">
 </head>
 
 <body>
@@ -577,13 +40,12 @@
           <h1>Benjamin Grandmontagne</h1>
 
           <p class="subtitle">
-            Finance professional working at the intersection of leadership, transformation, AI, and regulatory thinking.
+            Finance professional focused on turning complexity in AI, regulation, and transformation into clear decisions, practical systems, and better ways of working.
           </p>
 
           <p class="intro">
-            I am interested in how teams turn complexity into clear decisions, better systems, and practical progress.
-            My work brings together process improvement, technology, and legal awareness, with a growing focus
-            on responsible uses of AI in knowledge work.
+            I write and build around the practical side of complex work: decision systems, AI-enabled workflows,
+            regulatory change, and the habits that help teams move with more clarity.
           </p>
         </div>
 
@@ -653,7 +115,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Read Capital Complexity on Substack
+                Subscribe to Capital &amp; Complexity
               </a>
             </p>
           </article>
@@ -685,7 +147,7 @@
               systems, feedback loops, and simple interactive tools.
             </p>
             <p class="small">
-              <a href="CapitalClues.html">Play Capital Clues</a>
+              <a href="CapitalClues.html">Play</a>
             </p>
           </article>
 
@@ -696,7 +158,7 @@
               A small game for testing how well you can match memes with their cultural context.
             </p>
             <p class="small">
-              <a href="meme.html">Play Meme Match</a>
+              <a href="meme.html">Play</a>
             </p>
           </article>
         </div>
@@ -709,13 +171,12 @@
         </div>
 
         <p>
-          The best place to connect is
           <a
             href="https://www.linkedin.com/in/benjamin-grandmontagne-0a0674151"
             target="_blank"
             rel="noopener noreferrer"
           >
-            LinkedIn</a>.
+            Connect on LinkedIn</a>.
         </p>
       </section>
     </main>
