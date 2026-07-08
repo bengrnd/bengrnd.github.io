@@ -1,10 +1,7 @@
 :root {
   color-scheme: dark;
   --bg: #070b12;
-  --bg-2: #0b111b;
-  --surface: rgba(15, 22, 35, 0.82);
   --surface-solid: #101827;
-  --surface-strong: #151f31;
   --text: #f4efe3;
   --text-strong: #fff8ea;
   --muted: #b8b0a1;
@@ -17,7 +14,6 @@
   --brass: #a98548;
   --shadow: 0 34px 90px rgba(0, 0, 0, 0.42);
   --shadow-soft: 0 18px 48px rgba(0, 0, 0, 0.28);
-  --radius: 2px;
   --page-pad: clamp(18px, 4vw, 56px);
   --section-gap: clamp(72px, 9vw, 126px);
 }
@@ -93,12 +89,14 @@ h2 {
 h1 {
   max-width: 980px;
   font-size: clamp(48px, 7.8vw, 104px);
+  overflow-wrap: anywhere;
 }
 
 h2 {
   max-width: 800px;
   margin-bottom: 22px;
   font-size: clamp(30px, 4.2vw, 56px);
+  overflow-wrap: anywhere;
 }
 
 h3 {
@@ -188,6 +186,7 @@ main {
 .hero-content {
   position: relative;
   z-index: 1;
+  min-width: 0;
 }
 
 .hero-kicker,
@@ -225,6 +224,7 @@ main {
   font-size: clamp(24px, 3vw, 38px);
   line-height: 1.24;
   letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
 }
 
 .intro,
@@ -498,6 +498,7 @@ section {
   }
 
   .page {
+    width: min(100% - 24px, 1180px);
     padding-top: 14px;
     padding-bottom: 44px;
   }
@@ -508,7 +509,10 @@ section {
   }
 
   .nav-mark {
+    max-width: 100%;
     font-size: 11px;
+    letter-spacing: 0.11em;
+    white-space: normal;
   }
 
   .nav-links {
@@ -523,13 +527,30 @@ section {
   }
 
   .hero {
-    gap: 28px;
-    padding: 28px 20px;
+    gap: 26px;
+    padding: 24px 16px;
+    overflow: hidden;
+  }
+
+  .hero-kicker,
+  .section-kicker {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+
+  .hero-kicker::before,
+  .section-kicker::before {
+    width: 30px;
+    margin-right: 8px;
   }
 
   h1 {
-    font-size: clamp(40px, 12vw, 52px);
-    overflow-wrap: break-word;
+    max-width: 100%;
+    font-size: clamp(34px, 10vw, 43px);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+    overflow-wrap: anywhere;
+    word-break: normal;
   }
 
   h2 {
@@ -541,20 +562,37 @@ section {
   }
 
   .subtitle {
+    max-width: 100%;
     margin-top: 18px;
-    font-size: clamp(22px, 6.5vw, 30px);
+    font-size: clamp(20px, 5.8vw, 26px);
+    line-height: 1.28;
+    overflow-wrap: anywhere;
   }
 
   .intro,
   .lead,
   .section-copy {
+    max-width: 100%;
     font-size: 16px;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+  }
+
+  .primary-cta {
+    width: 100%;
+    max-width: 360px;
+    padding: 11px 14px;
+    text-align: center;
   }
 
   .hero-panel,
   .principles,
   .cards {
     grid-template-columns: 1fr;
+  }
+
+  .signal {
+    padding: 18px 0;
   }
 
   .principles article {
@@ -569,6 +607,16 @@ section {
 
   .contact {
     padding: 26px 20px;
+  }
+}
+
+@media (max-width: 380px) {
+  h1 {
+    font-size: clamp(31px, 9.3vw, 36px);
+  }
+
+  .subtitle {
+    font-size: clamp(19px, 5.4vw, 23px);
   }
 }
 
