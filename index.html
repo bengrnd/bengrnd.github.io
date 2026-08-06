@@ -32,6 +32,10 @@
       word-break: keep-all;
     }
 
+    .project-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     @media (max-width: 1080px) {
       .hero-title {
         font-size: clamp(48px, 8vw, 96px);
@@ -39,6 +43,10 @@
     }
 
     @media (max-width: 680px) {
+      .project-cards {
+        grid-template-columns: 1fr;
+      }
+
       .hero-title {
         font-size: clamp(31px, 9vw, 39px);
         line-height: 1.04;
@@ -234,7 +242,7 @@
           </p>
         </div>
 
-        <div class="cards">
+        <div class="cards project-cards">
           <article class="card">
             <span class="tag">Technical experiment</span>
             <h3>AI Workflow Lab</h3>
@@ -252,6 +260,17 @@
             </p>
             <p class="small">
               <a href="CapitalClues.html">Play Capital Clues</a>
+            </p>
+          </article>
+
+          <article class="card">
+            <span class="tag">Language game</span>
+            <h3>French Word Search</h3>
+            <p>
+              A browser-based word-search game for practising French vocabulary through themed puzzles, translations, and three difficulty levels.
+            </p>
+            <p class="small">
+              <a href="wordsearch.html">Play French Word Search</a>
             </p>
           </article>
 
