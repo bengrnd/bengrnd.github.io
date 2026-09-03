@@ -1,7 +1,8 @@
 import { THEME_VERSION } from "./themes.js";
 import { loadThemeEmbeddingCache, saveThemeEmbeddingCache } from "./storage.js";
 
-const MODEL_ID = "Xenova/multilingual-e5-small";
+const MODEL_ID = "Xenova/all-MiniLM-L6-v2";
+const CACHE_VERSION = `${THEME_VERSION}:${MODEL_ID}:int8`;
 const TRANSFORMERS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/+esm";
 let extractorPromise;
 
@@ -36,11 +37,11 @@ async function getExtractor(onProgress = () => {}) {
   return extractorPromise;
 }
 
-async function embed(extractor, texts, prefix, onProgress, label) {
+async function embed(extractor, texts, onProgress, label) {
   const vectors = [];
   for (let i = 0; i < texts.length; i += 1) {
     onProgress({ message: `${label} ${i + 1} of ${texts.length}`, percent: Math.round((i / texts.length) * 100) });
-    const output = await extractor(`${prefix}: ${texts[i]}`, { pooling: "mean", normalize: true });
+    const output = await extractor(texts[i], { pooling: "mean", normalize: true });
     vectors.push(Array.from(output.data));
   }
   return vectors;
@@ -48,17 +49,16 @@ async function embed(extractor, texts, prefix, onProgress, label) {
 
 export async function createSemanticVectors(areaTexts, themes, onProgress = () => {}) {
   const extractor = await getExtractor(onProgress);
-  let themeVectors = loadThemeEmbeddingCache(THEME_VERSION);
+  let themeVectors = loadThemeEmbeddingCache(CACHE_VERSION);
 
   if (!themeVectors || themeVectors.length !== themes.length) {
     themeVectors = await embed(
       extractor,
       themes.map((theme) => `${theme.label}. ${theme.description}`),
-      "passage",
       onProgress,
       "Learning theme"
     );
-    saveThemeEmbeddingCache(THEME_VERSION, themeVectors);
+    saveThemeEmbeddingCache(CACHE_VERSION, themeVectors);
   } else {
     onProgress({ message: "Using cached theme patterns", percent: 100 });
   }
@@ -67,7 +67,6 @@ export async function createSemanticVectors(areaTexts, themes, onProgress = () =
   const areaResults = await embed(
     extractor,
     entries.map(([, text]) => text),
-    "query",
     onProgress,
     "Analysing area"
   );

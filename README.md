@@ -21,7 +21,7 @@ This repository contains the static files for a GitHub Pages website. The site i
 
 - **Capital Clues** — browser game about guessing world capitals from structured clues.
 - **French Word Search** — themed browser puzzles for practising French vocabulary.
-- **Ikigai Creator** — a guided, private reflection tool using in-browser semantic theme extraction with Transformers.js and `Xenova/multilingual-e5-small`. Answers and cached theme vectors remain in browser storage; no backend or API key is used.
+- **Ikigai Creator** — a guided, private reflection tool using in-browser semantic theme extraction with Transformers.js and the quantized English `Xenova/all-MiniLM-L6-v2` model. Answers and cached theme vectors remain in browser storage; no backend or API key is used.
 - **Meme Match** — browser game about matching memes with cultural context.
 
 ## Local development
