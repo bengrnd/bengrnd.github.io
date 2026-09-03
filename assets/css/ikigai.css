@@ -362,6 +362,50 @@ textarea::placeholder { color: #9a9a91; }
 
 .area-result h3 { margin: 0; font-family: Georgia, serif; font-size: clamp(23px,3vw,32px); font-weight: 500; }
 
+.answer-evidence {
+  min-height: 142px;
+  margin-top: 22px;
+  padding: 17px 18px;
+  border-left: 2px solid var(--sage);
+  background: rgba(255,255,255,0.035);
+}
+
+.area-love .answer-evidence { border-left-color: var(--terracotta); }
+.area-good .answer-evidence { border-left-color: var(--gold); }
+.area-needs .answer-evidence { border-left-color: var(--blue); }
+
+.answer-evidence p {
+  margin: 0 0 8px;
+  color: #89938c;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.answer-evidence blockquote {
+  margin: 0;
+  color: var(--text);
+  font-family: Georgia, serif;
+  font-size: 16px;
+  line-height: 1.48;
+}
+
+.match-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 17px 0 0;
+  color: var(--sage);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.match-label span { font-size: 15px; font-weight: 400; }
+
 .area-result ol { display: grid; gap: 17px; margin: 24px 0 0; padding: 0; list-style: none; }
 
 .area-result li > div:first-child { display: flex; justify-content: space-between; gap: 15px; margin-bottom: 7px; color: var(--muted); font-size: 13px; }

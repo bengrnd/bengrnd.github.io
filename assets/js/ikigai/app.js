@@ -133,6 +133,18 @@ function themePill(theme, includeScore = true) {
   return `<li><span>${escapeHTML(theme.label)}</span>${includeScore ? `<strong>${theme.score ?? theme.relevance}</strong>` : ""}</li>`;
 }
 
+function representativeAnswer(area) {
+  const answered = area.questions
+    .map((question) => ({ question: question.label, answer: answers[question.id]?.trim() ?? "" }))
+    .filter((item) => item.answer)
+    .sort((a, b) => b.answer.length - a.answer.length);
+  const selected = answered[0] ?? { question: "Your reflection", answer: "No answer provided." };
+  const excerpt = selected.answer.length > 240
+    ? `${selected.answer.slice(0, 237).trimEnd()}…`
+    : selected.answer;
+  return { question: selected.question, excerpt };
+}
+
 function renderResults(byArea, intersections, overall, recommendations) {
   const leadThemes = overall.slice(0, 5);
   const intersectionThemes = intersections.slice(0, 8);
@@ -166,10 +178,17 @@ function renderResults(byArea, intersections, overall, recommendations) {
         <h2 id="areas-title">Strong themes in each area</h2>
       </div>
       <div class="area-results">
-        ${AREAS.map((area) => `
+        ${AREAS.map((area) => {
+          const evidence = representativeAnswer(area);
+          return `
           <article class="area-result area-${area.id}">
             <p class="area-number">${area.number}</p>
             <h3>${escapeHTML(area.title)}</h3>
+            <div class="answer-evidence">
+              <p>${escapeHTML(evidence.question)}</p>
+              <blockquote>“${escapeHTML(evidence.excerpt)}”</blockquote>
+            </div>
+            <p class="match-label"><span aria-hidden="true">↓</span> Semantically closest themes</p>
             <ol>
               ${byArea[area.id].slice(0, 5).map((theme) => `
                 <li>
@@ -177,9 +196,10 @@ function renderResults(byArea, intersections, overall, recommendations) {
                   <div class="score-track" aria-label="${escapeHTML(theme.label)} relative relevance ${theme.score} out of 100"><span style="width:${theme.score}%"></span></div>
                 </li>`).join("")}
             </ol>
-          </article>`).join("")}
+          </article>`;
+        }).join("")}
       </div>
-      <p class="score-note">Scores show relative similarity within your own answers. They are not personality measurements and should not be compared between people.</p>
+      <p class="score-note">Each quote shows some of the language used for that lens. The model compares the full set of answers—not only the displayed quote—with every theme description. Scores show relative similarity within your own answers; they are not personality measurements.</p>
     </section>
 
     <section class="result-section intersection-section" aria-labelledby="intersections-title">
