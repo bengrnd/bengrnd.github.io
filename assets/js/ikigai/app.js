@@ -1,6 +1,6 @@
 import { AREAS, ALL_QUESTIONS } from "./questions.js";
 import { THEMES } from "./themes.js";
-import { createSemanticVectors, MODEL_ID } from "./embeddings.js";
+import { createSemanticVectors, MODEL_ID } from "./embeddings.js?v=2";
 import { scoreAreas, findIntersections, topOverall } from "./scoring.js";
 import { buildRecommendations } from "./recommendations.js";
 import { loadAnswers, loadState, saveAnswers, saveState, resetUserData } from "./storage.js";
