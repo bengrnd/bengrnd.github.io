@@ -1,4 +1,4 @@
-import { THEME_VERSION } from "./themes.js";
+import { THEME_VERSION } from "./themes.js?v=2";
 import { loadThemeEmbeddingCache, saveThemeEmbeddingCache } from "./storage.js";
 
 const MODEL_ID = "Xenova/all-MiniLM-L6-v2";

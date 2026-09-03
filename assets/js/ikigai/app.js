@@ -1,7 +1,7 @@
 import { AREAS, ALL_QUESTIONS } from "./questions.js";
-import { THEMES } from "./themes.js";
+import { THEMES } from "./themes.js?v=2";
 import { createSemanticVectors, MODEL_ID } from "./embeddings.js?v=2";
-import { scoreAreas, findIntersections, topOverall } from "./scoring.js";
+import { scoreAreas, findIntersections, topOverall } from "./scoring.js?v=2";
 import { buildRecommendations } from "./recommendations.js";
 import { loadAnswers, loadState, saveAnswers, saveState, resetUserData } from "./storage.js";
 
@@ -114,8 +114,8 @@ function areaHasAnswer(area) {
 function createAreaTexts() {
   return Object.fromEntries(AREAS.map((area) => [area.id, area.questions
     .filter((question) => answers[question.id]?.trim())
-    .map((question) => `${question.label} ${answers[question.id].trim()}`)
-    .join(" ")]));
+    .map((question) => answers[question.id].trim())
+    .join(". ")]));
 }
 
 function updateLoading({ message, percent }) {
@@ -188,7 +188,7 @@ function renderResults(byArea, intersections, overall, recommendations) {
               <p>${escapeHTML(evidence.question)}</p>
               <blockquote>“${escapeHTML(evidence.excerpt)}”</blockquote>
             </div>
-            <p class="match-label"><span aria-hidden="true">↓</span> Semantically closest themes</p>
+            <p class="match-label"><span aria-hidden="true">↓</span> Closest themes by meaning and language</p>
             <ol>
               ${byArea[area.id].slice(0, 5).map((theme) => `
                 <li>
@@ -199,7 +199,7 @@ function renderResults(byArea, intersections, overall, recommendations) {
           </article>`;
         }).join("")}
       </div>
-      <p class="score-note">Each quote shows some of the language used for that lens. The model compares the full set of answers—not only the displayed quote—with every theme description. Scores show relative similarity within your own answers; they are not personality measurements.</p>
+      <p class="score-note">Each quote shows some of the language used for that lens. The model compares the full set of answers—not only the displayed quote—with every theme description, then gives a small boost when meaningful words also align. Scores are relative matches within your answers, not personality measurements.</p>
     </section>
 
     <section class="result-section intersection-section" aria-labelledby="intersections-title">
@@ -239,8 +239,9 @@ async function analyse() {
   elements.loadingBar.style.width = "0%";
   elements.loadingPercent.textContent = "";
   try {
-    const { areaVectors, themeVectors } = await createSemanticVectors(createAreaTexts(), THEMES, updateLoading);
-    const byArea = scoreAreas(areaVectors, themeVectors, THEMES);
+    const areaTexts = createAreaTexts();
+    const { areaVectors, themeVectors } = await createSemanticVectors(areaTexts, THEMES, updateLoading);
+    const byArea = scoreAreas(areaVectors, themeVectors, THEMES, areaTexts);
     const intersections = findIntersections(byArea, THEMES);
     const overall = topOverall(byArea, THEMES);
     const recommendations = buildRecommendations(byArea, intersections);

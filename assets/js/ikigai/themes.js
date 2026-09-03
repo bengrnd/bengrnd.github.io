@@ -1,4 +1,4 @@
-export const THEME_VERSION = "2026-09-03-v1";
+export const THEME_VERSION = "2026-09-03-v2";
 
 export const THEMES = [
   { id: "creativity", label: "Creativity", description: "Generating original ideas, imaginative concepts and fresh ways of expressing or solving something." },
@@ -10,7 +10,7 @@ export const THEMES = [
   { id: "leadership", label: "Leadership", description: "Setting direction, creating confidence and helping a group make progress through uncertainty." },
   { id: "entrepreneurship", label: "Entrepreneurship", description: "Identifying opportunities and creating useful products, services or organisations under uncertainty." },
   { id: "helping", label: "Helping others", description: "Supporting people's wellbeing, progress or confidence through useful and compassionate action." },
-  { id: "languages", label: "Languages", description: "Learning, using, translating or teaching languages and connecting across linguistic cultures." },
+  { id: "languages", label: "Languages", description: "Learning to speak or teaching a foreign language such as Danish, French, Spanish, German or English; translating and connecting across linguistic cultures." },
   { id: "research", label: "Research", description: "Investigating questions deeply, gathering reliable evidence and building new understanding." },
   { id: "problem_solving", label: "Problem solving", description: "Untangling difficult situations and designing practical, effective ways forward." },
   { id: "independence", label: "Independence", description: "Working autonomously, choosing one's direction and taking ownership of decisions and outcomes." },
