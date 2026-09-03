@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A private, browser-based Ikigai reflection tool that finds themes across what you love, do well, care about and can offer.">
+  <meta name="theme-color" content="#0b1212">
+  <link rel="canonical" href="https://bengrnd.github.io/ikigai.html">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/ikigai.css">
+  <title>Ikigai Creator | Explore patterns worth pursuing</title>
+</head>
+<body data-view="questionnaire">
+  <a class="skip-link" href="#main-content">Skip to questions</a>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="/">Benjamin Grandmontagne</a>
+      <div class="topbar-actions">
+        <span class="privacy-badge"><span aria-hidden="true">●</span> Private in your browser</span>
+        <a href="/">Back home</a>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section id="questionnaire" class="questionnaire" aria-labelledby="step-title">
+        <aside class="progress-panel" aria-label="Questionnaire progress">
+          <div>
+            <p class="product-label">Ikigai Creator</p>
+            <p class="progress-label" id="progress-label">Part 1 of 4</p>
+          </div>
+          <div class="progress-track" role="progressbar" aria-label="Questionnaire progress" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1">
+            <span id="progress-bar"></span>
+          </div>
+          <ol class="progress-steps" id="progress-steps"></ol>
+          <div class="privacy-note">
+            <strong>Your reflection stays yours.</strong>
+            <p>Answers are saved only on this device. Analysis runs locally; no answers are sent to an API.</p>
+          </div>
+        </aside>
+
+        <form id="question-form" class="question-card" novalidate>
+          <header class="question-header">
+            <p class="step-number" id="step-number">01</p>
+            <div>
+              <h1 id="step-title" tabindex="-1">What you love</h1>
+              <p id="step-prompt">Notice the activities, subjects and moments that naturally pull you in.</p>
+            </div>
+          </header>
+          <div id="question-fields"></div>
+          <footer class="form-actions">
+            <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+            <div>
+              <button id="back-button" class="button button-secondary" type="button">Back</button>
+              <button id="next-button" class="button button-primary" type="submit">Next part</button>
+            </div>
+          </footer>
+        </form>
+      </section>
+
+      <section id="loading-panel" class="state-panel" aria-labelledby="loading-title" aria-live="polite" hidden>
+        <div class="orbital-loader" aria-hidden="true"><span></span></div>
+        <p class="product-label">Local semantic analysis</p>
+        <h1 id="loading-title">Finding patterns in your answers</h1>
+        <p id="loading-copy">Preparing the local model…</p>
+        <div class="model-progress">
+          <div><span id="loading-bar"></span></div>
+          <strong id="loading-percent"></strong>
+        </div>
+        <p class="model-note">The first run downloads a quantized model of about 120 MB. It may take a few minutes; subsequent runs should reuse the browser cache.</p>
+        <p class="model-id">Model: <span id="model-name"></span></p>
+      </section>
+
+      <section id="error-panel" class="state-panel error-panel" aria-labelledby="error-title" hidden>
+        <p class="product-label">Analysis paused</p>
+        <h1 id="error-title">We could not finish the local analysis</h1>
+        <p id="error-message"></p>
+        <div class="state-actions">
+          <button id="retry-button" class="button button-primary" type="button">Try again</button>
+          <button class="button button-secondary" type="button" data-reset>Reset answers</button>
+        </div>
+      </section>
+
+      <section id="results" class="results" hidden>
+        <div id="results-content"></div>
+        <footer class="results-actions">
+          <div>
+            <h2>Keep it as a conversation, not a verdict.</h2>
+            <p>Edit an answer, notice what changes, and test promising directions in small ways.</p>
+          </div>
+          <div>
+            <button id="edit-button" class="button button-primary" type="button">Edit answers</button>
+            <button class="button button-danger" type="button" data-reset>Reset everything</button>
+          </div>
+        </footer>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Ikigai Creator · A private reflection tool</p>
+      <p>No accounts · No tracking · No API keys</p>
+    </footer>
+  </div>
+  <script type="module" src="assets/js/ikigai/app.js"></script>
+</body>
+</html>
